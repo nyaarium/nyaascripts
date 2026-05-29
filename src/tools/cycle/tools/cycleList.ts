@@ -20,6 +20,7 @@ export const cycleList = {
 	description:
 		"List the cycle definitions available in the nyaascripts cycles library, with each one's steps. Use this to discover what cycles you can run with cycleStart.",
 	operation: "listing cycle definitions",
+	schema,
 	async handler(_cwd: string, args: z.infer<typeof schema>) {
 		schema.parse(args);
 		const cycles = listCycleDefs().map((name) => {
