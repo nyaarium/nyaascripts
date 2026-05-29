@@ -152,7 +152,9 @@ Remote control for Cursor IDE agents via API.
 Drive an agent through a named, looping procedure (a "cycle") defined by a markdown file, tracking
 progress self-contained in a subject doc's front matter. Cycle definitions live in the nyaascripts
 cycles library at `<install-dir>/cycles/<name>.md` (override with `NYAASCRIPTS_CYCLES_DIR`): front
-matter `steps: [...]` (+ optional `maxLaps`) and one `## <step>` section per step.
+matter `steps: [...]` (+ optional `maxLaps`) and one `## <step>` section per step. The library
+resolves next to the compiled binary, so copy the `cycles/` directory alongside `nyaascripts` when
+installing. Ships with `idea-refinement` and `audited-implementation` definitions.
 
 | Tool | Description | Mutable | dryRun |
 |------|-------------|---------|--------|
