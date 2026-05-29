@@ -66,7 +66,7 @@ Framework loop: if framework-first issues still remain, cycleGoto back to `frame
 concluding.
 
 This is the last step, so it ends the lap. Conclude it with cycleNext as usual; because it is the
-last step, cycleNext returns lapEnd and points you at the checkpoint. Then call
+last step, cycleNext returns lapEnd and points you at cycleCheckpoint. Then call
 cycleCheckpoint({ plan, decision, summary }) with the phase-loop decision:
 
 - Unfinished phases left in plan.md -> `loop` (wraps back to `implement` to start the next phase).

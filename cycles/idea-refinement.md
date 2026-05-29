@@ -37,7 +37,7 @@ After all return, rethink. Plan changed? Update plan.md. Watch out for: yes-mann
 heavy drift (ask the human on large drifts).
 
 This is the last step, so it ends the lap. Conclude it with cycleNext (because it is the last step,
-cycleNext returns lapEnd and points you at the checkpoint), then call
+cycleNext returns lapEnd and points you at cycleCheckpoint), then call
 cycleCheckpoint({ plan, decision, summary }):
 
 - Plan feels solid -> `done`, and give a final report to the channel.
