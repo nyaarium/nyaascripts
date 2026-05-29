@@ -29,6 +29,10 @@ describe("loadCycleDef", () => {
 		expect(d.steps).toEqual(["a", "b"]);
 		expect(d.maxLaps).toBe(3);
 	});
+	it("falls back to the default for a non-integer maxLaps", () => {
+		fs.writeFileSync(path.join(dir, "frac.md"), "---\nsteps: [a]\nmaxLaps: 2.5\n---\n## a\nx\n");
+		expect(loadCycleDef("frac").maxLaps).toBe(8);
+	});
 	it("lists available definitions", () => {
 		expect(listCycleDefs()).toContain("good");
 	});

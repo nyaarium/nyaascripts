@@ -70,6 +70,9 @@ export function loadCycleDef(name: string): CycleDef {
 	// Every step must resolve to exactly one section (extractSection throws on missing/duplicate).
 	for (const step of steps) extractSection(body, step);
 
-	const maxLaps = typeof fields.maxLaps === "number" && fields.maxLaps > 0 ? fields.maxLaps : DEFAULT_MAX_LAPS;
+	const maxLaps =
+		typeof fields.maxLaps === "number" && Number.isInteger(fields.maxLaps) && fields.maxLaps > 0
+			? fields.maxLaps
+			: DEFAULT_MAX_LAPS;
 	return { name, steps, maxLaps, body };
 }

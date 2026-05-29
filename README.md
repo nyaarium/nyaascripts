@@ -147,6 +147,22 @@ Remote control for Cursor IDE agents via API.
 | `gmailSearch` | Search Gmail messages |
 | `gmailFetchMessages` | Fetch full message content |
 
+### Cycle (6 tools)
+
+Drive an agent through a named, looping procedure (a "cycle") defined by a markdown file, tracking
+progress self-contained in a subject doc's front matter. Cycle definitions live in the nyaascripts
+cycles library at `<install-dir>/cycles/<name>.md` (override with `NYAASCRIPTS_CYCLES_DIR`): front
+matter `steps: [...]` (+ optional `maxLaps`) and one `## <step>` section per step.
+
+| Tool | Description | Mutable | dryRun |
+|------|-------------|---------|--------|
+| `cycleStart` | Initialize a named cycle on a subject doc | Yes | Yes |
+| `cycleStep` | Advance one step (confirm-then-advance via `completed`) | Yes | Yes |
+| `cycleCheckpoint` | End-of-lap decision: done / loop / critical-stop | Yes | Yes |
+| `cycleStatus` | Report cycle position and convergence signal | No | - |
+| `cycleGoto` | Jump to a step, or reopen a finished cycle | Yes | Yes |
+| `cycleList` | List available cycle definitions | No | - |
+
 ### Utility (1 tool)
 
 | Tool | Description |
