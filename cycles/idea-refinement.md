@@ -13,7 +13,7 @@ plan being refined; its body churns each lap while these steps stay fixed.
 
 Propose or refine the plan. Write the current state to `./temp/plan.md`.
 
-When done, advance with cycleStep.
+When done, conclude this step with cycleNext.
 
 ## audit
 
@@ -23,13 +23,13 @@ one per angle:
 - Point to plan.md.
 - Give the angle. Report only, no edits.
 
-When all four are dispatched and returned, advance.
+When all four are dispatched and returned, conclude this step with cycleNext.
 
 ## triage
 
 Triage each report on arrival. Real gap vs overcautious / out-of-scope / hallucinated? Re-think.
 
-Advance when every report has been classified.
+Conclude this step with cycleNext once every report has been classified.
 
 ## rethink
 

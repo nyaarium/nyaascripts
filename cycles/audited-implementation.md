@@ -15,7 +15,7 @@ real issues.
 Implement the phase. /coding skill hygiene. Complex code -> handle yourself. Have a team? Delegate
 to team agents only if the task is so simple they cannot fail.
 
-Advance when the phase is implemented.
+Conclude this step with cycleNext once the phase is implemented.
 
 ## alignment-audit
 
@@ -25,27 +25,27 @@ plan.md. Report only, no edits. The agent runs its own `git diff` (no paste; the
 Triage gate: classify each finding as real deviation vs plan ambiguity / intentional refinement.
 A confident tone is not evidence; verify against the code.
 
-Advance to the smoke test.
+Conclude this step with cycleNext.
 
 ## smoke-test
 
 Perform smoke tests (run editor/game instances, introspection checks, screenshots, etc). Fix real
 misalignments. No commit. Have a team? If it is their role, ask them to unit-test or smoke run.
 
-Alignment loop: if you fixed anything, cycleGoto back to `alignment-audit`. Else advance.
+Alignment loop: if you fixed anything, cycleGoto back to `alignment-audit`. Otherwise conclude this step with cycleNext.
 
 ## framework-review
 
 /framework-first-design skill. Agent(opus) -> catch code crust, antipatterns, dupes, pain points,
 whatever. Run the triage gate: real gap vs overcautious / out-of-scope / hallucinated.
 
-Advance to fix the committable scope.
+Conclude this step with cycleNext.
 
 ## fix-committable
 
 Fix the committable scope, most significant first.
 
-Advance to the red team.
+Conclude this step with cycleNext.
 
 ## red-team
 
@@ -58,14 +58,14 @@ one per angle:
 
 Triage gate each report on arrival (categories from framework-review).
 
-Advance.
+Conclude this step with cycleNext.
 
 ## fix-and-smoke
 
 After all return, fix the real issues. No commit yet. Watch out for: yes-manning, scope creep,
 drift from codebase patterns. Then perform smoke tests again.
 
-Red team loop: if you fixed any red-team issues, cycleGoto back to `red-team` until clean. Else advance.
+Red team loop: if you fixed any red-team issues, cycleGoto back to `red-team` until clean. Otherwise conclude this step with cycleNext.
 
 ## commit
 
