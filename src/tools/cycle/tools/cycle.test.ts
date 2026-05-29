@@ -2,6 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "bun:test"
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { toolsCycle } from "../index.ts";
 import { cycleCheckpoint } from "./cycleCheckpoint.ts";
 import { cycleGoto } from "./cycleGoto.ts";
 import { cycleList } from "./cycleList.ts";
@@ -162,4 +163,30 @@ describe("cycle tool lifecycle", () => {
 		expect(names).toContain("demo");
 		expect(names).toContain("cap");
 	});
+});
+
+// Registration smoke test: mirrors what entry.ts's registerTool loop requires of every tool, so a
+// tool missing its `schema` field (which crashes the whole stdio server on startup) is caught here.
+describe("toolsCycle registration shape", () => {
+	it("exports six tools", () => {
+		expect(toolsCycle).toHaveLength(6);
+	});
+	for (const tool of toolsCycle) {
+		const t = tool as {
+			name?: unknown;
+			title?: unknown;
+			description?: unknown;
+			schema?: { shape?: unknown };
+			handler?: unknown;
+		};
+		it(`"${String(t.name)}" has the fields registerTool needs`, () => {
+			expect(typeof t.name).toBe("string");
+			expect(typeof t.title).toBe("string");
+			expect(typeof t.description).toBe("string");
+			expect(typeof t.handler).toBe("function");
+			// The exact access entry.ts does (tool.schema.shape); undefined schema throws here.
+			expect(t.schema).toBeDefined();
+			expect(typeof t.schema?.shape).toBe("object");
+		});
+	}
 });
