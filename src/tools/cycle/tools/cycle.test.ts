@@ -5,9 +5,9 @@ import path from "node:path";
 import { cycleCheckpoint } from "./cycleCheckpoint.ts";
 import { cycleGoto } from "./cycleGoto.ts";
 import { cycleList } from "./cycleList.ts";
+import { cycleNext } from "./cycleNext.ts";
 import { cycleStart } from "./cycleStart.ts";
 import { cycleStatus } from "./cycleStatus.ts";
-import { cycleStep } from "./cycleStep.ts";
 
 let cwd: string;
 let cyclesDir: string;
@@ -46,17 +46,17 @@ describe("cycle tool lifecycle", () => {
 		expect(start.status).toBe("active");
 		expect(start.steps).toEqual(["a", "b", "c"]);
 		expect(start.instructions).toContain("Alpha");
-		expect(start.instructions).toContain('cycleStep({ plan: "plan.md", completed: "a" })');
+		expect(start.instructions).toContain('cycleNext({ plan: "plan.md", completed: "a" })');
 
 		// Bare step (no completed) does not advance.
-		const peek = await run(cycleStep, { plan: "plan.md" });
+		const peek = await run(cycleNext, { plan: "plan.md" });
 		expect(peek.advanced).toBe(false);
 		expect(peek.step).toBe("a");
 
-		expect((await run(cycleStep, { plan: "plan.md", completed: "a" })).step).toBe("b");
-		expect((await run(cycleStep, { plan: "plan.md", completed: "b" })).step).toBe("c");
+		expect((await run(cycleNext, { plan: "plan.md", completed: "a" })).step).toBe("b");
+		expect((await run(cycleNext, { plan: "plan.md", completed: "b" })).step).toBe("c");
 
-		const end = await run(cycleStep, { plan: "plan.md", completed: "c" });
+		const end = await run(cycleNext, { plan: "plan.md", completed: "c" });
 		expect(end.lapEnd).toBe(true);
 		expect(end.advanced).toBe(false);
 
@@ -72,12 +72,12 @@ describe("cycle tool lifecycle", () => {
 		const done = await run(cycleCheckpoint, { plan: "plan.md", decision: "done", summary: "solid" });
 		expect(done.status).toBe("done");
 
-		await expect(run(cycleStep, { plan: "plan.md", completed: "a" })).rejects.toThrow("reopen");
+		await expect(run(cycleNext, { plan: "plan.md", completed: "a" })).rejects.toThrow("reopen");
 	});
 
 	it("case-insensitive completed echo advances", async () => {
 		await run(cycleStart, { plan: "p.md", cycle: "demo" });
-		expect((await run(cycleStep, { plan: "p.md", completed: "A" })).step).toBe("b");
+		expect((await run(cycleNext, { plan: "p.md", completed: "A" })).step).toBe("b");
 	});
 
 	it("refuses to clobber an active cycle without force", async () => {
@@ -97,7 +97,7 @@ describe("cycle tool lifecycle", () => {
 
 	it("enforces the maxLaps soft cap, then honors acknowledgeOverrun", async () => {
 		await run(cycleStart, { plan: "p.md", cycle: "cap" });
-		await run(cycleStep, { plan: "p.md", completed: "x" });
+		await run(cycleNext, { plan: "p.md", completed: "x" });
 		const capped = await run(cycleCheckpoint, { plan: "p.md", decision: "loop", summary: "lap" });
 		expect(capped.lapLimitReached).toBe(true);
 		expect(capped.lap).toBe(0);
@@ -112,23 +112,23 @@ describe("cycle tool lifecycle", () => {
 
 	it("goto with resetLap zeroes the lap and convergence signal", async () => {
 		await run(cycleStart, { plan: "p.md", cycle: "demo" });
-		await run(cycleStep, { plan: "p.md", completed: "a" });
-		await run(cycleStep, { plan: "p.md", completed: "b" });
-		await run(cycleStep, { plan: "p.md", completed: "c" });
+		await run(cycleNext, { plan: "p.md", completed: "a" });
+		await run(cycleNext, { plan: "p.md", completed: "b" });
+		await run(cycleNext, { plan: "p.md", completed: "c" });
 		await run(cycleCheckpoint, { plan: "p.md", decision: "loop", summary: "lap" });
 		const reset = await run(cycleGoto, { plan: "p.md", step: "a", resetLap: true });
 		expect(reset.lap).toBe(0);
 	});
 
 	it("errors when stepping before start", async () => {
-		await expect(run(cycleStep, { plan: "missing.md" })).rejects.toThrow("cycleStart first");
+		await expect(run(cycleNext, { plan: "missing.md" })).rejects.toThrow("cycleStart first");
 	});
 
 	it("returns needsResolution (not a throw) when the current step left the definition", async () => {
 		await run(cycleStart, { plan: "p.md", cycle: "demo" });
 		const file = path.join(cwd, "p.md");
 		fs.writeFileSync(file, fs.readFileSync(file, "utf8").replace("current: a", "current: ghost"));
-		const stepped = await run(cycleStep, { plan: "p.md", completed: "ghost" });
+		const stepped = await run(cycleNext, { plan: "p.md", completed: "ghost" });
 		expect(stepped.needsResolution).toBe(true);
 		expect(stepped.advanced).toBe(false);
 		const status = await run(cycleStatus, { plan: "p.md" });

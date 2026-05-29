@@ -14,7 +14,9 @@ const schema = z.object({
 	completed: z
 		.string()
 		.optional()
-		.describe("The step you just finished. Advancing only happens when this matches the current step."),
+		.describe(
+			"Name of the step you just finished. Must match the current step; concluding it is what advances the cycle.",
+		),
 	dryRun: z.boolean().optional().default(false).describe("Report the next state without writing."),
 });
 
@@ -37,12 +39,12 @@ const OutputSchema = z.object({
 	dryRun: z.boolean().optional(),
 });
 
-export const cycleStep = {
-	name: "cycleStep",
-	title: "cycle-step",
+export const cycleNext = {
+	name: "cycleNext",
+	title: "cycle-next",
 	description:
-		"Advance one step within a running cycle. Requires the `completed` step name to actually advance (a bare call just reports the current step, so a forgotten echo fails safe). Finishing the last step returns lapEnd and points at cycleCheckpoint. If the current step name is no longer in the definition, it returns needsResolution instead of guessing.",
-	operation: "stepping a cycle",
+		"Conclude the step you just finished and move to the next one. This IS normal forward progress through a cycle: do the current step's work, then call cycleNext with `completed` set to that step's name. Concluding the step is the advance, so you never need cycleGoto to go forward. `completed` is required and must match the current step (a bare call only reports the current step and does not advance, so a forgotten name fails safe). Concluding the last step returns lapEnd and points at cycleCheckpoint. If the current step no longer exists in the definition, it returns needsResolution instead of guessing.",
+	operation: "concluding a step",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {
 		const { plan, completed, dryRun } = schema.parse(args);
@@ -83,7 +85,7 @@ export const cycleStep = {
 				index: progress.index,
 				advanced: false,
 				instructions: instructions(progress.current),
-				nextAction: `Do this step, then call cycleStep({ plan: "${plan}", completed: "${progress.current}" }) to advance.`,
+				nextAction: `Do the work for step "${progress.current}", then call cycleNext({ plan: "${plan}", completed: "${progress.current}" }) to conclude it and move on. (cycleNext is normal forward progress; you do not need cycleGoto to advance.)`,
 			};
 			return { data: OutputSchema.parse(result) };
 		}
@@ -112,7 +114,7 @@ export const cycleStep = {
 			index: move.index,
 			advanced: true,
 			instructions: appendStepCall(instructions(move.current), plan, move.current),
-			nextAction: `Do step "${move.current}", then call cycleStep({ plan: "${plan}", completed: "${move.current}" }).`,
+			nextAction: `Now do the work for step "${move.current}", then call cycleNext({ plan: "${plan}", completed: "${move.current}" }) to conclude it and continue.`,
 			...(dryRun ? { dryRun: true } : {}),
 		};
 		return { data: OutputSchema.parse(result) };

@@ -159,7 +159,7 @@ installing. Ships with `idea-refinement` and `audited-implementation` definition
 | Tool | Description | Mutable | dryRun |
 |------|-------------|---------|--------|
 | `cycleStart` | Initialize a named cycle on a subject doc | Yes | Yes |
-| `cycleStep` | Advance one step (confirm-then-advance via `completed`) | Yes | Yes |
+| `cycleNext` | Advance one step (confirm-then-advance via `completed`) | Yes | Yes |
 | `cycleCheckpoint` | End-of-lap decision: done / loop / critical-stop | Yes | Yes |
 | `cycleStatus` | Report cycle position and convergence signal | No | - |
 | `cycleGoto` | Jump to a step, or reopen a finished cycle | Yes | Yes |

@@ -115,7 +115,7 @@ export function loadCycleRun(cwd: string, plan: string, opts: { requireActive: b
 
 // The literal next call travels with the instructions so it stays in the agent's working context.
 export function appendStepCall(instructions: string, plan: string, step: string): string {
-	return `${instructions}\n\n>> When this step's work is done, call cycleStep({ plan: "${plan}", completed: "${step}" }).`;
+	return `${instructions}\n\n>> When this step's work is done, call cycleNext({ plan: "${plan}", completed: "${step}" }) to conclude it and move to the next step. This is normal forward progress; do not use cycleGoto to advance.`;
 }
 
 export function checkpointCall(plan: string): string {

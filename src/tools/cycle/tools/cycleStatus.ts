@@ -25,7 +25,7 @@ export const cycleStatus = {
 	name: "cycleStatus",
 	title: "cycle-status",
 	description:
-		"Report where a subject is in its cycle without mutating anything: current step, index, lap, status, and the convergence signal. The go-to tool for resuming or telling whether a cycle finished, stopped, or stalled.",
+		"Report where a subject is in its cycle without mutating anything: current step, index, lap, status, and the convergence signal. Use this to resume, or to tell whether a cycle finished, stopped, or stalled.",
 	operation: "reading cycle status",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {

@@ -80,7 +80,7 @@ export const cycleCheckpoint = {
 				step: next.current,
 				unchangedLaps: next.unchanged_laps,
 				instructions: appendStepCall(instructions(next.current), plan, next.current),
-				nextAction: `New lap ${next.lap}. Do step "${next.current}", then cycleStep({ plan: "${plan}", completed: "${next.current}" }).`,
+				nextAction: `New lap ${next.lap}. Do the work for step "${next.current}", then call cycleNext({ plan: "${plan}", completed: "${next.current}" }) to continue.`,
 				...(dryRun ? { dryRun: true } : {}),
 			};
 			return { data: OutputSchema.parse(result) };

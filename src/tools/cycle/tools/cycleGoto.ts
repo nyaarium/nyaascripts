@@ -26,7 +26,7 @@ export const cycleGoto = {
 	name: "cycleGoto",
 	title: "cycle-goto",
 	description:
-		"Jump to a named step (redo, skip, or recover after needsResolution). Also reopens a done/stopped cycle by setting it active. Optionally resets the lap counter.",
+		"Jump to a named step when leaving the normal path: redo a step, skip ahead, or recover after needsResolution. This is NOT how you advance normally; for normal forward progress conclude each step with cycleNext instead. Also reopens a done/stopped cycle by setting it active. Optionally resets the lap counter.",
 	operation: "jumping to a step",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {
@@ -58,7 +58,7 @@ export const cycleGoto = {
 			lap: next.lap,
 			status: "active",
 			instructions: appendStepCall(instructions(canonical), plan, canonical),
-			nextAction: `Do step "${canonical}", then cycleStep({ plan: "${plan}", completed: "${canonical}" }).`,
+			nextAction: `Resumed at step "${canonical}". Do the work, then call cycleNext({ plan: "${plan}", completed: "${canonical}" }) to continue forward.`,
 			...(dryRun ? { dryRun: true } : {}),
 		};
 		return { data: OutputSchema.parse(result) };
