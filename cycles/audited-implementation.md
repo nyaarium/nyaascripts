@@ -65,8 +65,10 @@ Committable chunk: update docs -> gitStage + gitCommit.
 Framework loop: if framework-first issues still remain, cycleGoto back to `framework` instead of
 concluding.
 
-This is the end of a lap. At the checkpoint (the phase loop):
+This is the last step, so it ends the lap. Conclude it with cycleNext as usual; because it is the
+last step, cycleNext returns lapEnd and points you at the checkpoint. Then call
+cycleCheckpoint({ plan, decision, summary }) with the phase-loop decision:
 
-- Unfinished phases left in plan.md -> decision `loop` to start the next phase from `implement`.
-- All phases done -> decision `done`.
-- A critical blocker -> decision `critical-stop`.
+- Unfinished phases left in plan.md -> `loop` (wraps back to `implement` to start the next phase).
+- All phases done -> `done`.
+- A critical blocker -> `critical-stop`.

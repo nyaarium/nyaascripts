@@ -36,8 +36,10 @@ Conclude this step with cycleNext once every report has been classified.
 After all return, rethink. Plan changed? Update plan.md. Watch out for: yes-manning, scope creep,
 heavy drift (ask the human on large drifts).
 
-This is the end of a lap. At the checkpoint:
+This is the last step, so it ends the lap. Conclude it with cycleNext (because it is the last step,
+cycleNext returns lapEnd and points you at the checkpoint), then call
+cycleCheckpoint({ plan, decision, summary }):
 
-- Plan feels solid -> decision `done`, and give a final report to the channel.
-- A critical issue you cannot resolve in-loop -> decision `critical-stop` (you may /questionaire again).
-- Otherwise -> decision `loop` to refine for another lap.
+- Plan feels solid -> `done`, and give a final report to the channel.
+- A critical issue you cannot resolve in-loop -> `critical-stop` (you may /questionaire again).
+- Otherwise -> `loop` to refine for another lap.
