@@ -50,7 +50,10 @@ from codebase patterns. If you fixed anything, re-run the red team; repeat until
 ## commit
 
 Update docs, then gitStage + gitCommit. If framework-first issues still remain, cycleGoto back to
-`framework` instead.
+`framework` instead of ending the lap.
 
-Phase-loop decision: unfinished phases left in plan.md -> `loop` (start the next phase); all phases
-done -> `done`; a critical blocker -> `critical-stop`.
+Otherwise end the lap: call cycleCheckpoint with one of
+
+- `loop` - unfinished phases left in plan.md; starts the next phase
+- `done` - all phases done
+- `critical-stop` - a critical blocker
