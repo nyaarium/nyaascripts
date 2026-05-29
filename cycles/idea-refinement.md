@@ -17,8 +17,8 @@ When done, conclude this step with cycleNext.
 
 ## audit
 
-Pick 4 audit angles to vet the idea for gaps, blockers, concerns. Dispatch 4 parallel Agent(opus),
-one per angle:
+Analysis only, no edits: pick 4 audit angles to vet the idea for gaps, blockers, concerns. Dispatch
+4 parallel Agent(opus), one per angle:
 
 - Point to plan.md.
 - Give the angle. Report only, no edits.

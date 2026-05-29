@@ -1,14 +1,14 @@
 ---
-steps: [implement, alignment-audit, smoke-test, framework-review, fix-committable, red-team, fix-and-smoke, commit]
+steps: [implement, align, framework, red-team, commit]
 maxLaps: 12
 ---
 
 # Audited Phase Implementation
 
-Implement one phase of a plan, then put it through alignment, framework, and red-team audits with
-triage gates before committing. One lap = one phase; loop to start the next phase, or finish when
-the plan has no phases left. Several steps loop back internally with cycleGoto when a gate finds
-real issues.
+Implement one phase of a plan, then harden it through alignment, framework, and red-team passes
+before committing. One lap = one phase: loop to start the next phase, or finish when the plan has
+no phases left. Each audit pass analyzes and triages with NO edits first, then applies only the
+real findings.
 
 ## implement
 
@@ -17,61 +17,53 @@ to team agents only if the task is so simple they cannot fail.
 
 Conclude this step with cycleNext once the phase is implemented.
 
-## alignment-audit
+## align
 
-Plan alignment audit. Dispatch Agent(opus) -> compare the implementation vs the questionnaire and
-plan.md. Report only, no edits. The agent runs its own `git diff` (no paste; the fresh-diff rule).
+Analysis first, no edits: plan alignment audit. Dispatch Agent(opus) -> compare the implementation
+vs the questionnaire and plan.md. Report only, no edits. The agent runs its own `git diff` (no
+paste; the fresh-diff rule). Triage gate: classify each finding as real deviation vs plan ambiguity
+/ intentional refinement. A confident tone is not evidence; verify against the code.
 
-Triage gate: classify each finding as real deviation vs plan ambiguity / intentional refinement.
-A confident tone is not evidence; verify against the code.
+Then fix the real misalignments and run smoke tests (run editor/game instances, introspection
+checks, screenshots, etc). No commit. Have a team? If it is their role, ask them to unit-test or
+smoke run. If a fix changed anything, re-run the audit; repeat until it comes back clean.
 
-Conclude this step with cycleNext.
+Conclude this step with cycleNext when alignment is clean.
 
-## smoke-test
+## framework
 
-Perform smoke tests (run editor/game instances, introspection checks, screenshots, etc). Fix real
-misalignments. No commit. Have a team? If it is their role, ask them to unit-test or smoke run.
+Analysis first, no edits: /framework-first-design skill. Dispatch Agent(opus) -> catch code crust,
+antipatterns, dupes, pain points, whatever. Triage gate: real gap vs overcautious / out-of-scope /
+hallucinated.
 
-Alignment loop: if you fixed anything, cycleGoto back to `alignment-audit`. Otherwise conclude this step with cycleNext.
-
-## framework-review
-
-/framework-first-design skill. Agent(opus) -> catch code crust, antipatterns, dupes, pain points,
-whatever. Run the triage gate: real gap vs overcautious / out-of-scope / hallucinated.
-
-Conclude this step with cycleNext.
-
-## fix-committable
-
-Fix the committable scope, most significant first.
+Then apply only the real findings, most significant first, scoped to one coherent committable
+chunk. No commit yet.
 
 Conclude this step with cycleNext.
 
 ## red-team
 
-Red team. Pick 4 audit angles to vet the implementation for gaps. Dispatch 4 parallel Agent(opus),
-one per angle:
+Analysis first, no edits: pick 4 audit angles to vet the implementation for gaps. Dispatch 4
+parallel Agent(opus), one per angle:
 
 - Each gets: the issue/finding context + their angle.
 - Report only, no edits.
 - The fresh-diff rule applies.
 
-Triage gate each report on arrival (categories from framework-review).
+Triage gate each report on arrival: real gap vs overcautious / out-of-scope / hallucinated.
 
-Conclude this step with cycleNext.
+Then fix the real issues and run smoke tests again. No commit yet. Watch out for: yes-manning,
+scope creep, drift from codebase patterns. If you fixed anything, re-run the red team; repeat until
+it comes back clean.
 
-## fix-and-smoke
-
-After all return, fix the real issues. No commit yet. Watch out for: yes-manning, scope creep,
-drift from codebase patterns. Then perform smoke tests again.
-
-Red team loop: if you fixed any red-team issues, cycleGoto back to `red-team` until clean. Otherwise conclude this step with cycleNext.
+Conclude this step with cycleNext when the red team is clean.
 
 ## commit
 
 Committable chunk: update docs -> gitStage + gitCommit.
 
-Framework loop: if framework-first issues remain, cycleGoto back to `framework-review`.
+Framework loop: if framework-first issues still remain, cycleGoto back to `framework` instead of
+concluding.
 
 This is the end of a lap. At the checkpoint (the phase loop):
 
