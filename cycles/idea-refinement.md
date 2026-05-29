@@ -11,14 +11,15 @@ plan being refined; its body churns each lap while these steps stay fixed.
 
 ## propose
 
-Propose or refine the plan. Write the current state to `./temp/plan.md`.
+Propose or refine the plan. Write the current state back into the plan (the subject doc this cycle
+was started on).
 
 ## audit
 
 Analysis only, no edits: pick 4 audit angles to vet the idea for gaps, blockers, concerns. Dispatch
 4 parallel Agent(opus), one per angle:
 
-- Point to plan.md.
+- Point them at the plan.
 - Give the angle. Report only, no edits.
 
 ## triage
@@ -27,7 +28,7 @@ Triage each report on arrival. Real gap vs overcautious / out-of-scope / halluci
 
 ## rethink
 
-After all return, rethink. Plan changed? Update plan.md. Watch out for: yes-manning, scope creep,
+After all return, rethink. Plan changed? Update the plan. Watch out for: yes-manning, scope creep,
 heavy drift (ask the human on large drifts).
 
 End the lap: call cycleCheckpoint with one of
