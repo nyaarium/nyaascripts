@@ -17,7 +17,7 @@ to team agents only if the task is so simple they cannot fail.
 ## align
 
 Analysis first, no edits: plan alignment audit. Dispatch Agent(opus) -> compare the implementation
-vs the questionnaire and plan.md. Report only, no edits. The agent runs its own `git diff` (no
+vs the questionnaire and the plan. Report only, no edits. The agent runs its own `git diff` (no
 paste; the fresh-diff rule). Triage gate: real deviation vs plan ambiguity / intentional
 refinement. A confident tone is not evidence; verify against the code.
 
@@ -54,6 +54,6 @@ Update docs, then gitStage + gitCommit. If framework-first issues still remain, 
 
 Otherwise end the lap: call cycleCheckpoint with one of
 
-- `loop` - unfinished phases left in plan.md; starts the next phase
+- `loop` - unfinished phases left in the plan; starts the next phase
 - `done` - all phases done
 - `critical-stop` - a critical blocker
