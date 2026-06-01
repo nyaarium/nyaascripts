@@ -3,7 +3,7 @@ steps: [propose, audit, triage, rethink]
 maxLaps: 8
 ---
 
-# Idea Refinement
+# Plan Refinement
 
 A convergence loop for hardening a plan or idea. Each lap proposes, audits from multiple angles,
 triages the findings, and rethinks, looping until the plan feels solid. The subject doc is the
@@ -16,7 +16,7 @@ was started on).
 
 ## audit
 
-Analysis only, no edits: pick 4 audit angles to vet the idea for gaps, blockers, concerns. Dispatch
+Analysis only, no edits: pick 4 audit angles to vet the plan for gaps, blockers, concerns. Dispatch
 4 parallel Agent(opus), one per angle:
 
 - Point them at the plan.
