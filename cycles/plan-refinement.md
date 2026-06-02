@@ -12,12 +12,14 @@ plan being refined; its body churns each lap while these steps stay fixed.
 ## propose
 
 Propose or refine the plan. Write the current state back into the plan (the subject doc this cycle
-was started on).
+was started on). If a proposal already exists (e.g. from the questionnaire), you may conclude this
+step immediately.
 
 ## audit
 
-Analysis only, no edits: pick 4 audit angles to vet the plan for gaps, blockers, concerns. Dispatch
-4 parallel Agent(opus), one per angle:
+Analysis only, no edits: pick audit angles to vet the plan for gaps, blockers, concerns, and
+dispatch one parallel Agent(opus) per angle. Scale breadth to change size (2 focused for a small
+delta, or more than 4 for a massive rewrite):
 
 - Point them at the plan.
 - Give the angle. Report only, no edits.

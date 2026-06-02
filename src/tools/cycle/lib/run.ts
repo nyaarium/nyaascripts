@@ -1,21 +1,19 @@
 import fs from "node:fs";
+import path from "node:path";
 import { z } from "zod";
 import { writeFileAtomic } from "./atomicWrite.ts";
-import { hashSubjectBody } from "./computeNext.ts";
+import { hashBody } from "./computeNext.ts";
 import { extractSection } from "./extractSection.ts";
-import { parseFrontMatter, type Scalar, upsertTopLevelBlock } from "./frontMatter.ts";
 import { type CycleDef, loadCycleDef } from "./resolveCycleDef.ts";
 import { resolvePlanPath } from "./resolvePlanPath.ts";
 
-export const CYCLE_BLOCK_KEY = "cycle";
-
-// The progress block persisted into the subject doc's front matter. The core 7 fields drive the
-// state machine; summary/converged_at_lap are recorded only on a terminal checkpoint decision.
+// Cycle progress lives in a JSON sidecar next to the plan, NOT in the plan itself, so the tools
+// never touch the document the author is editing (no file-write race against pending body edits).
 export const ProgressSchema = z.object({
 	name: z.string().min(1),
 	current: z.string().min(1),
 	index: z.number().int().nonnegative(),
-	lap: z.number().int().nonnegative(),
+	lap: z.number().int().positive(),
 	unchanged_laps: z.number().int().nonnegative(),
 	body_hash: z.string().min(1),
 	status: z.enum(["active", "done", "stopped"]),
@@ -25,59 +23,64 @@ export const ProgressSchema = z.object({
 
 export type StoredProgress = z.infer<typeof ProgressSchema>;
 
+// `plans/spring.md` -> `plans/spring.cycle.json`. A non-markdown plan keeps its name: `x.txt` ->
+// `x.txt.cycle.json`.
+export function sidecarPathFor(planPath: string): string {
+	return `${planPath.replace(/\.(md|mdx|markdown)$/i, "")}.cycle.json`;
+}
+
 export interface Subject {
 	planPath: string;
-	content: string;
-	mtimeMs?: number;
+	sidecarPath: string;
+	content: string; // the plan doc (for the convergence hash); "" if it does not exist yet
+	sidecarMtimeMs?: number;
 	progress: StoredProgress | null;
-	// True when a `cycle:` block is present but fails schema validation. Lets callers distinguish
-	// "corrupted run" from "no run" so a single bad field cannot be silently overwritten.
+	// True when the sidecar exists but is unreadable/invalid. Lets callers distinguish "corrupted
+	// run" from "no run" so a single bad field cannot be silently overwritten.
 	malformed: boolean;
 }
 
-// Read a subject doc and its current progress block (null when uninitialized, missing, or malformed).
+// Read the plan doc (for hashing) and its progress sidecar (null when uninitialized/missing/malformed).
 export function readSubject(cwd: string, plan: string): Subject {
 	const planPath = resolvePlanPath(cwd, plan);
-	if (!fs.existsSync(planPath)) {
-		return { planPath, content: "", mtimeMs: undefined, progress: null, malformed: false };
+	const sidecarPath = sidecarPathFor(planPath);
+
+	if (fs.existsSync(sidecarPath) && fs.lstatSync(sidecarPath).isSymbolicLink()) {
+		throw new Error(`refusing to use a symlinked cycle sidecar: ${path.basename(sidecarPath)}`);
 	}
-	const content = fs.readFileSync(planPath, "utf8");
-	const mtimeMs = fs.statSync(planPath).mtimeMs;
-	const block = parseFrontMatter(content).fields[CYCLE_BLOCK_KEY];
-	const present = block !== undefined && block !== null && typeof block === "object";
-	const parsed = present ? ProgressSchema.safeParse(block) : null;
-	const progress = parsed?.success ? parsed.data : null;
-	return { planPath, content, mtimeMs, progress, malformed: present && !progress };
-}
 
-function toScalarRecord(progress: StoredProgress): Record<string, Scalar> {
-	const record: Record<string, Scalar> = {
-		name: progress.name,
-		current: progress.current,
-		index: progress.index,
-		lap: progress.lap,
-		unchanged_laps: progress.unchanged_laps,
-		body_hash: progress.body_hash,
-		status: progress.status,
-	};
-	if (progress.summary !== undefined) record.summary = progress.summary;
-	if (progress.converged_at_lap !== undefined) record.converged_at_lap = progress.converged_at_lap;
-	return record;
-}
+	const content = fs.existsSync(planPath) ? fs.readFileSync(planPath, "utf8") : "";
 
-// Render the new content with the progress block written, and persist it atomically (unless
-// dryRun). The mtime guard refuses the write if the file changed since it was read.
-export function writeProgress(subject: Subject, progress: StoredProgress, dryRun: boolean): string {
-	const next = upsertTopLevelBlock(subject.content, CYCLE_BLOCK_KEY, toScalarRecord(progress));
-	if (!dryRun) {
-		writeFileAtomic(subject.planPath, next, { expectedMtimeMs: subject.mtimeMs });
+	let progress: StoredProgress | null = null;
+	let malformed = false;
+	let sidecarMtimeMs: number | undefined;
+	if (fs.existsSync(sidecarPath)) {
+		sidecarMtimeMs = fs.statSync(sidecarPath).mtimeMs;
+		try {
+			const parsed = ProgressSchema.safeParse(JSON.parse(fs.readFileSync(sidecarPath, "utf8")));
+			if (parsed.success) progress = parsed.data;
+			else malformed = true;
+		} catch {
+			malformed = true;
+		}
 	}
-	return next;
+
+	return { planPath, sidecarPath, content, sidecarMtimeMs, progress, malformed };
 }
 
-// Hash the subject body (excluding front matter) for the convergence signal.
+// Persist progress to the sidecar atomically (unless dryRun). The mtime guard refuses the write if
+// the sidecar changed since it was read.
+export function writeProgress(subject: Subject, progress: StoredProgress, dryRun: boolean): void {
+	if (dryRun) return;
+	writeFileAtomic(subject.sidecarPath, `${JSON.stringify(progress, null, 2)}\n`, {
+		expectedMtimeMs: subject.sidecarMtimeMs,
+	});
+}
+
+// Hash the whole plan doc for the convergence signal. The tools never write the plan, so any change
+// is the author's.
 export function bodyHashOf(content: string): string {
-	return hashSubjectBody(content);
+	return hashBody(content);
 }
 
 export interface ResolvedDef {

@@ -1,6 +1,5 @@
-// Hand-rolled, fail-closed front matter handling. No YAML dep on purpose: a full
-// parse/serialize round-trip reformats and strips comments, which would clobber the
-// subject doc. We only ever read a narrow subset and surgically rewrite one top-level block.
+// Hand-rolled, fail-closed, read-only front matter parsing for cycle definition files (steps,
+// maxLaps). No YAML dep on purpose; we only read a narrow modeled subset.
 
 export type Eol = "\n" | "\r\n";
 
@@ -18,18 +17,8 @@ export function hasBom(content: string): boolean {
 	return content.charCodeAt(0) === 0xfeff;
 }
 
-// Dominant EOL of the whole document, so a single stray CRLF in an otherwise-LF body does not
-// flip the result. Used only when creating front matter from scratch.
-export function detectEol(content: string): Eol {
-	const crlf = (content.match(/\r\n/g) ?? []).length;
-	const lf = (content.match(/\n/g) ?? []).length - crlf;
-	return crlf > lf ? "\r\n" : "\n";
-}
-
 // Locate the front matter span. Opening "---" must be the first line (after an optional BOM);
 // the closing "---" is the first later line that is exactly "---". Returns null when absent.
-// eol is taken from the opening line's own terminator (the front matter's EOL), so a rewrite
-// of the block always matches the block it is replacing, regardless of the body's line endings.
 export function locateFrontMatter(content: string): FrontMatterLocation | null {
 	const bom = hasBom(content);
 	const start = bom ? 1 : 0;
@@ -225,100 +214,4 @@ export function parseFrontMatter(content: string): ParsedFrontMatter {
 		fields: parseFrontMatterFields(fmText),
 		body: content.slice(location.bodyStart),
 	};
-}
-
-function escapeDoubleQuoted(v: string): string {
-	return v
-		.replace(/\\/g, "\\\\")
-		.replace(/"/g, '\\"')
-		.replace(/\n/g, "\\n")
-		.replace(/\r/g, "\\r")
-		.replace(/\t/g, "\\t");
-}
-
-function serializeScalar(v: Scalar): string {
-	if (v === null) return "null";
-	if (typeof v === "number" || typeof v === "boolean") return String(v);
-	// Always quote (and escape) when the value contains a line break or structural/ambiguous
-	// content, so it can never break the front-matter block boundary or re-parse as another type.
-	const hasControl = /[\n\r\t]/.test(v);
-	const ambiguous =
-		/^-?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(v) ||
-		/^0x[0-9a-fA-F]+$/.test(v) ||
-		/^(true|false|null|yes|no|on|off|~)$/i.test(v);
-	const structural = v === "" || /[:#]/.test(v) || v !== v.trim() || /^[[{!&*?|>%@`"']/.test(v);
-	return hasControl || ambiguous || structural ? `"${escapeDoubleQuoted(v)}"` : v;
-}
-
-function keyLineMatches(line: string, key: string): boolean {
-	return line === `${key}:` || line.startsWith(`${key}: `);
-}
-
-// Render a one-level map as a top-level key block, two-space indented (YAML forbids tab
-// indentation, so never emit tabs here regardless of repo style).
-function renderMapBlock(key: string, obj: Record<string, Scalar>, eol: Eol): string {
-	const lines = [`${key}:`];
-	for (const [k, v] of Object.entries(obj)) {
-		lines.push(`  ${k}: ${serializeScalar(v)}`);
-	}
-	return lines.join(eol);
-}
-
-// Surgically replace (or insert) a single top-level key whose value is a one-level map, inside
-// the front matter. This function OWNS rendering: callers pass data, not text, so the document's
-// own EOL is always used and a caller cannot introduce a mismatched line ending. The body is
-// preserved byte-for-byte; BOM and dominant EOL are preserved; trailing blank lines never grow.
-export function upsertTopLevelBlock(content: string, key: string, value: Record<string, Scalar>): string {
-	const location = locateFrontMatter(content);
-	// Use the front matter's own EOL when it exists, so the rewritten block matches the block it
-	// replaces even if the body uses different line endings. Only fall back to the document's
-	// dominant EOL when creating front matter from scratch.
-	const eol: Eol = location ? location.eol : detectEol(content);
-	const blockLines = renderMapBlock(key, value, eol).split(eol);
-
-	if (!location) {
-		const bom = hasBom(content) ? "\uFEFF" : "";
-		const rest = hasBom(content) ? content.slice(1) : content;
-		return `${bom}---${eol}${blockLines.join(eol)}${eol}---${eol}${rest}`;
-	}
-
-	const fmText = content.slice(location.fmStart, location.fmEnd);
-	const lines = fmText.split(/\r?\n/);
-	while (lines.length > 0 && lines[lines.length - 1].trim() === "") lines.pop();
-
-	let startIdx = -1;
-	for (let i = 0; i < lines.length; i++) {
-		if (keyLineMatches(lines[i], key)) {
-			startIdx = i;
-			break;
-		}
-	}
-
-	if (startIdx === -1) {
-		lines.push(...blockLines);
-	} else {
-		// Consume the whole block: indented continuation lines, and blank lines that are
-		// themselves followed by more indented lines. Stop at a blank that precedes the next
-		// top-level key, so a separator before an unrelated key is preserved.
-		let endIdx = startIdx + 1;
-		while (endIdx < lines.length) {
-			if (indentOf(lines[endIdx]) > 0) {
-				endIdx++;
-				continue;
-			}
-			if (lines[endIdx].trim() === "") {
-				let k = endIdx + 1;
-				while (k < lines.length && lines[k].trim() === "") k++;
-				if (k < lines.length && indentOf(lines[k]) > 0) {
-					endIdx = k;
-					continue;
-				}
-			}
-			break;
-		}
-		lines.splice(startIdx, endIdx - startIdx, ...blockLines);
-	}
-
-	const newFm = `${lines.join(eol)}${eol}`;
-	return content.slice(0, location.fmStart) + newFm + content.slice(location.fmEnd);
 }

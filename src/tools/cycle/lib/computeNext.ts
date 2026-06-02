@@ -1,5 +1,4 @@
 import { createHash } from "node:crypto";
-import { parseFrontMatter } from "./frontMatter.ts";
 
 export type CycleStatus = "active" | "done" | "stopped";
 
@@ -44,13 +43,6 @@ export function hashBody(body: string): string {
 	return createHash("sha1").update(body).digest("hex").slice(0, 16);
 }
 
-// The convergence signal must hash the SUBJECT BODY only, never the front matter. The cycle:
-// block is rewritten every step/lap, so hashing the whole file would change every lap and pin
-// unchanged_laps at 0 forever, silently killing the signal. Phase 2 calls this, not hashBody.
-export function hashSubjectBody(content: string): string {
-	return hashBody(parseFrontMatter(content).body);
-}
-
 export interface LoopResult {
 	progress: CycleProgress;
 	lapLimitReached: boolean;
@@ -76,6 +68,8 @@ export function applyLoop(progress: CycleProgress, steps: string[], newBodyHash:
 			body_hash: newBodyHash,
 			status: "active",
 		},
-		lapLimitReached: lap >= maxLaps,
+		// Laps are 1-indexed (lap 1 is the first lap), so a loop into lap maxLaps+1 trips the cap;
+		// laps 1..maxLaps are allowed.
+		lapLimitReached: lap > maxLaps,
 	};
 }

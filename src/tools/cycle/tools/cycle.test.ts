@@ -20,6 +20,14 @@ async function run(tool: { handler: (cwd: string, args: any) => Promise<unknown>
 	return out.data;
 }
 
+// Progress lives in `<plan>.cycle.json`; corrupt that sidecar to simulate drift/corruption.
+function corruptSidecar(plan: string, mutate: (p: Record<string, unknown>) => void): void {
+	const sc = path.join(cwd, plan.replace(/\.md$/, ".cycle.json"));
+	const prog = JSON.parse(fs.readFileSync(sc, "utf8"));
+	mutate(prog);
+	fs.writeFileSync(sc, JSON.stringify(prog));
+}
+
 beforeAll(() => {
 	cyclesDir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), "cyclesdef-")));
 	process.env.NYAASCRIPTS_CYCLES_DIR = cyclesDir;
@@ -48,6 +56,11 @@ describe("cycle tool lifecycle", () => {
 		expect(start.steps).toEqual(["a", "b", "c"]);
 		expect(start.instructions).toContain("Alpha");
 		expect(start.instructions).toContain('cycleNext({ plan: "plan.md", completed: "a" })');
+		expect(start.lap).toBe(1);
+
+		// Progress lives in a sidecar; the tool never creates or touches the plan doc.
+		expect(fs.existsSync(path.join(cwd, "plan.cycle.json"))).toBe(true);
+		expect(fs.existsSync(path.join(cwd, "plan.md"))).toBe(false);
 
 		// Bare step (no completed) does not advance.
 		const peek = await run(cycleNext, { plan: "plan.md" });
@@ -62,12 +75,12 @@ describe("cycle tool lifecycle", () => {
 		expect(end.advanced).toBe(false);
 
 		const looped = await run(cycleCheckpoint, { plan: "plan.md", decision: "loop", summary: "did a lap" });
-		expect(looped.lap).toBe(1);
+		expect(looped.lap).toBe(2);
 		expect(looped.step).toBe("a");
 
 		const status = await run(cycleStatus, { plan: "plan.md" });
 		expect(status.initialized).toBe(true);
-		expect(status.lap).toBe(1);
+		expect(status.lap).toBe(2);
 		expect(status.step).toBe("a");
 
 		const done = await run(cycleCheckpoint, { plan: "plan.md", decision: "done", summary: "solid" });
@@ -101,14 +114,14 @@ describe("cycle tool lifecycle", () => {
 		await run(cycleNext, { plan: "p.md", completed: "x" });
 		const capped = await run(cycleCheckpoint, { plan: "p.md", decision: "loop", summary: "lap" });
 		expect(capped.lapLimitReached).toBe(true);
-		expect(capped.lap).toBe(0);
+		expect(capped.lap).toBe(1);
 		const ack = await run(cycleCheckpoint, {
 			plan: "p.md",
 			decision: "loop",
 			summary: "lap",
 			acknowledgeOverrun: true,
 		});
-		expect(ack.lap).toBe(1);
+		expect(ack.lap).toBe(2);
 	});
 
 	it("goto with resetLap zeroes the lap and convergence signal", async () => {
@@ -118,7 +131,7 @@ describe("cycle tool lifecycle", () => {
 		await run(cycleNext, { plan: "p.md", completed: "c" });
 		await run(cycleCheckpoint, { plan: "p.md", decision: "loop", summary: "lap" });
 		const reset = await run(cycleGoto, { plan: "p.md", step: "a", resetLap: true });
-		expect(reset.lap).toBe(0);
+		expect(reset.lap).toBe(1);
 	});
 
 	it("errors when stepping before start", async () => {
@@ -127,8 +140,9 @@ describe("cycle tool lifecycle", () => {
 
 	it("returns needsResolution (not a throw) when the current step left the definition", async () => {
 		await run(cycleStart, { plan: "p.md", cycle: "demo" });
-		const file = path.join(cwd, "p.md");
-		fs.writeFileSync(file, fs.readFileSync(file, "utf8").replace("current: a", "current: ghost"));
+		corruptSidecar("p.md", (p) => {
+			p.current = "ghost";
+		});
 		const stepped = await run(cycleNext, { plan: "p.md", completed: "ghost" });
 		expect(stepped.needsResolution).toBe(true);
 		expect(stepped.advanced).toBe(false);
@@ -139,8 +153,9 @@ describe("cycle tool lifecycle", () => {
 
 	it("status reports an error (not a throw) when the definition is gone", async () => {
 		await run(cycleStart, { plan: "p.md", cycle: "demo" });
-		const file = path.join(cwd, "p.md");
-		fs.writeFileSync(file, fs.readFileSync(file, "utf8").replace("name: demo", "name: vanished"));
+		corruptSidecar("p.md", (p) => {
+			p.name = "vanished";
+		});
 		const status = await run(cycleStatus, { plan: "p.md" });
 		expect(status.initialized).toBe(true);
 		expect(status.error).toContain("unknown cycle");
@@ -148,8 +163,9 @@ describe("cycle tool lifecycle", () => {
 
 	it("guards a malformed cycle block from being clobbered without force", async () => {
 		await run(cycleStart, { plan: "p.md", cycle: "demo" });
-		const file = path.join(cwd, "p.md");
-		fs.writeFileSync(file, fs.readFileSync(file, "utf8").replace("status: active", "status: bogus"));
+		corruptSidecar("p.md", (p) => {
+			p.status = "bogus";
+		});
 		const status = await run(cycleStatus, { plan: "p.md" });
 		expect(status.initialized).toBe(false);
 		expect(status.malformed).toBe(true);

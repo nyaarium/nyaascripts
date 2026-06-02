@@ -35,8 +35,9 @@ Then apply only the real findings, most significant first, scoped to one coheren
 
 ## red-team
 
-Analysis first, no edits: pick 4 audit angles to vet the implementation for gaps. Dispatch 4
-parallel Agent(opus), one per angle:
+Analysis first, no edits: pick audit angles to vet the implementation for gaps, and dispatch one
+parallel Agent(opus) per angle. Scale breadth to change size (2 focused for a small delta, or more
+than 4 for a massive rewrite):
 
 - Each gets: the issue/finding context + their angle.
 - Report only, no edits.

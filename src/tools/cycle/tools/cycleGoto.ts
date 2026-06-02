@@ -42,7 +42,7 @@ export const cycleGoto = {
 			current: canonical,
 			index: def.steps.indexOf(canonical),
 			status: "active",
-			lap: resetLap ? 0 : progress.lap,
+			lap: resetLap ? 1 : progress.lap,
 			unchanged_laps: resetLap ? 0 : progress.unchanged_laps,
 			// Re-seed the convergence baseline on reset so the next loop compares against the body now.
 			body_hash: resetLap ? bodyHashOf(subject.content) : progress.body_hash,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { advance, applyLoop, type CycleProgress, findStep, hashBody, hashSubjectBody } from "./computeNext.ts";
+import { advance, applyLoop, type CycleProgress, findStep, hashBody } from "./computeNext.ts";
 
 const steps = ["propose", "audit", "triage", "rethink"];
 
@@ -34,16 +34,6 @@ describe("findStep", () => {
 	});
 });
 
-describe("hashSubjectBody", () => {
-	it("ignores front matter changes and tracks only the body", () => {
-		const a = "---\ncycle:\n  lap: 1\n---\nBODY\n";
-		const b = "---\ncycle:\n  lap: 99\n  status: done\n---\nBODY\n";
-		const c = "---\ncycle:\n  lap: 1\n---\nDIFFERENT\n";
-		expect(hashSubjectBody(a)).toBe(hashSubjectBody(b));
-		expect(hashSubjectBody(a)).not.toBe(hashSubjectBody(c));
-	});
-});
-
 describe("applyLoop", () => {
 	const base: CycleProgress = {
 		name: "c",
@@ -66,9 +56,14 @@ describe("applyLoop", () => {
 	it("increments unchanged_laps when the body did not change", () => {
 		expect(applyLoop(base, steps, "H", 8).progress.unchanged_laps).toBe(1);
 	});
-	it("flags lapLimitReached at the cap", () => {
+	it("allows the loop into the last permitted lap (laps 1..maxLaps)", () => {
 		const r = applyLoop({ ...base, lap: 7 }, steps, "H2", 8);
 		expect(r.progress.lap).toBe(8);
+		expect(r.lapLimitReached).toBe(false);
+	});
+	it("flags lapLimitReached when the loop would exceed maxLaps", () => {
+		const r = applyLoop({ ...base, lap: 8 }, steps, "H2", 8);
+		expect(r.progress.lap).toBe(9);
 		expect(r.lapLimitReached).toBe(true);
 	});
 	it("throws on an empty step list", () => {
