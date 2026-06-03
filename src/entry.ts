@@ -4,7 +4,6 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import dotenv from "dotenv";
 import type { z } from "zod";
-import { toolsCycle } from "./tools/cycle/index.ts";
 import { toolsGit } from "./tools/git/index.ts";
 import { toolsGitHub } from "./tools/github/index.ts";
 import { toolsGoogle } from "./tools/google/index.ts";
@@ -68,7 +67,7 @@ function registerTool(tool: McpTool) {
 	);
 }
 
-for (const tool of [...toolsTreeMd, ...toolsGit, ...toolsGitHub, ...toolsGoogle, ...toolsCycle]) {
+for (const tool of [...toolsTreeMd, ...toolsGit, ...toolsGitHub, ...toolsGoogle]) {
 	registerTool(tool as McpTool);
 }
 
