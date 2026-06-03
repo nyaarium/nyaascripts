@@ -53,7 +53,7 @@ const schema = z.object({
 		.string()
 		.min(1)
 		.describe(
-			"Commit message. One short phrase or sentence. Verb first, no prefixes. Do not use words like \"fix\" unless the human has confirmed the change is the correct solution; for unverified attempts, use words like \"attempt\" or \"try\" instead. If related to issues, end with (fixes #N) for bugfixes, (closes #N) for completed tasks, (related #N) to link without closing.",
+			"Commit message. One short phrase or sentence. Verb first, no prefixes. Describe only what changed, not process. Don't include plan/cycle/slice/lap labels or progress narrative anywhere (not at the front, not at the end), e.g. \"(slice 4)\", \"(some phase name)\". The only allowed trailing parenthetical is an issue link. Do not use words like \"fix\" unless the human has confirmed the change is the correct solution; for unverified attempts, use words like \"attempt\" or \"try\" instead. If related to issues, end with (fixes #N) for bugfixes, (closes #N) for completed tasks, (related #N) to link without closing.",
 		),
 	repoPath: repoPathParam,
 	amend: z
