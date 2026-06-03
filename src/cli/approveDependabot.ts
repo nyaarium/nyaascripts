@@ -1,6 +1,6 @@
-import dotenv from "dotenv";
 import path from "node:path";
 import readline from "node:readline";
+import dotenv from "dotenv";
 import { githubApproveDependabot } from "../tools/github/tools/githubApproveDependabot.ts";
 
 const scriptDir = path.dirname(new URL(import.meta.url).pathname);

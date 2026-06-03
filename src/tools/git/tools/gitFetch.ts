@@ -100,8 +100,11 @@ const schema = z.object({
 export const gitFetch = {
 	name: "gitFetch",
 	title: "git-fetch",
-	description:
-		"Fetch from remote and prune deleted remote-tracking references. Returns structured output showing new branches, updated refs, and pruned refs.",
+	description: `
+Fetch from remote and prune deleted remote-tracking references.
+
+Returns structured output showing new branches, updated refs, and pruned refs.
+`.trim(),
 	operation: "fetching from remote",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {

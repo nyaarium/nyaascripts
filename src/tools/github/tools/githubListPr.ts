@@ -113,20 +113,50 @@ const schema = z.object({
 	repo: z
 		.string()
 		.optional()
-		.describe("When provided, must be full OWNER/REPO. Leave out unless targeting another repo."),
-	state: z.enum(["open", "closed", "merged", "all"]).optional().default("open").describe("Filter by PR state."),
-	limit: z.number().int().min(1).max(100).optional().default(20).describe("Max number of PRs to return."),
+		.describe(
+			`
+When provided, must be full OWNER/REPO. Leave out unless targeting another repo.
+`.trim(),
+		),
+	state: z
+		.enum(["open", "closed", "merged", "all"])
+		.optional()
+		.default("open")
+		.describe(
+			`
+Filter by PR state.
+`.trim(),
+		),
+	limit: z
+		.number()
+		.int()
+		.min(1)
+		.max(100)
+		.optional()
+		.default(20)
+		.describe(
+			`
+Max number of PRs to return.
+`.trim(),
+		),
 	outputPath: z
 		.string()
 		.optional()
-		.describe("Optional path to write JSON output. If provided, returns path info instead of full data."),
+		.describe(
+			`
+Optional path to write JSON output. If provided, returns path info instead of full data.
+`.trim(),
+		),
 });
 
 export const githubListPr = {
 	name: "githubListPr",
 	title: "github-list-pr",
-	description:
-		"Brief listing of GitHub pull requests. Returns: number, title, state, author, mergeStateStatus, mergedAt, mergeCommit, statusCheckRollup. Use to find PRs by title and spot mergability or status checks. For full details use github-fetch-pr with a specific PR id.",
+	description: `
+Brief listing of GitHub pull requests.
+
+Returns: number, title, state, author, mergeStateStatus, mergedAt, mergeCommit, statusCheckRollup. Use to find PRs by title and spot mergability or status checks. For full details use github-fetch-pr with a specific PR id.
+`.trim(),
 	operation: "listing PRs",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {

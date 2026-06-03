@@ -3,24 +3,47 @@ import { checkGHCLI } from "../lib/checkGHCLI.ts";
 import { runGh } from "../lib/runGh.ts";
 
 const schema = z.object({
-	runId: z.string().describe("The workflow run ID to re-run."),
-	repo: z.string().optional().describe("Full OWNER/REPO. Leave out for current repo."),
+	runId: z.string().describe(
+		`
+The workflow run ID to re-run.
+`.trim(),
+	),
+	repo: z
+		.string()
+		.optional()
+		.describe(
+			`
+Full OWNER/REPO. Leave out for current repo.
+`.trim(),
+		),
 	onlyFailed: z
 		.boolean()
 		.optional()
 		.default(false)
-		.describe("If true, only re-run failed jobs instead of the entire workflow."),
+		.describe(
+			`
+If true, only re-run failed jobs instead of the entire workflow.
+`.trim(),
+		),
 	dryRun: z
 		.boolean()
 		.optional()
 		.default(false)
-		.describe("If true, report what would be done without actually re-running."),
+		.describe(
+			`
+If true, report what would be done without actually re-running.
+`.trim(),
+		),
 });
 
 export const githubRerunWorkflow = {
 	name: "githubRerunWorkflow",
 	title: "github-rerun-workflow",
-	description: "Re-run a GitHub Actions workflow run. Can re-run all jobs or only failed jobs. Mutating action.",
+	description: `
+Re-run a GitHub Actions workflow run.
+
+Can re-run all jobs or only failed jobs. Mutating action.
+`.trim(),
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {
 		const { runId, repo, onlyFailed = false, dryRun = false } = args;

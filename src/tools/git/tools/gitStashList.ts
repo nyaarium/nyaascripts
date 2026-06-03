@@ -56,7 +56,9 @@ const schema = z.object({
 export const gitStashList = {
 	name: "gitStashList",
 	title: "git-stash-list",
-	description: "List all stashes in the local git repository.",
+	description: `
+List all stashes in the local git repository.
+`.trim(),
 	operation: "listing stashes",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {

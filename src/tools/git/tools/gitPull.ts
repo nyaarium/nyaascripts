@@ -134,8 +134,11 @@ const schema = z.object({
 export const gitPull = {
 	name: "gitPull",
 	title: "git-pull",
-	description:
-		"Pull changes from the remote for the current branch. Returns structured output with merge strategy, file changes, and any conflicts.",
+	description: `
+Pull changes from the remote for the current branch.
+
+Returns structured output with merge strategy, file changes, and any conflicts.
+`.trim(),
 	operation: "pulling from remote",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {

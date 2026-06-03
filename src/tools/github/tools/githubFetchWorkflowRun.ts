@@ -103,19 +103,41 @@ export function transformRunDetail(raw: z.infer<typeof InputRunDetailSchema>): z
 }
 
 const schema = z.object({
-	runId: z.string().describe("The workflow run ID to fetch details for."),
-	repo: z.string().optional().describe("Full OWNER/REPO. Leave out for current repo."),
+	runId: z.string().describe(
+		`
+The workflow run ID to fetch details for.
+`.trim(),
+	),
+	repo: z
+		.string()
+		.optional()
+		.describe(
+			`
+Full OWNER/REPO.
+
+Leave out for current repo.
+`.trim(),
+		),
 	jobName: z
 		.string()
 		.optional()
-		.describe("If provided, fetch logs for this specific job only. Must match a job name from the run."),
+		.describe(
+			`
+If provided, fetch logs for this specific job only.
+
+Must match a job name from the run.
+`.trim(),
+		),
 });
 
 export const githubFetchWorkflowRun = {
 	name: "githubFetchWorkflowRun",
 	title: "github-fetch-workflow-run",
-	description:
-		"Fetch details for a single GitHub Actions workflow run, including job breakdown with steps. Optionally fetch logs for a specific job by name.",
+	description: `
+Fetch details for a single GitHub Actions workflow run, including job breakdown with steps.
+
+Optionally fetch logs for a specific job by name.
+`.trim(),
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {
 		const { runId, repo, jobName } = args;

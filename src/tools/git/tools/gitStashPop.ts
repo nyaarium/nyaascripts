@@ -30,14 +30,25 @@ const OutputSchema = z.object({
 });
 
 const schema = z.object({
-	name: z.string().min(1).describe("The name of the stash to pop."),
+	name: z
+		.string()
+		.min(1)
+		.describe(
+			`
+The name of the stash to pop.
+`.trim(),
+		),
 	repoPath: repoPathParam,
 });
 
 export const gitStashPop = {
 	name: "gitStashPop",
 	title: "git-stash-pop",
-	description: "Pop a stash by its name. Finds the matching stash and applies it, removing it from the stash list.",
+	description: `
+Pop a stash by its name.
+
+Finds the matching stash and applies it, removing it from the stash list.
+`.trim(),
 	operation: "popping stash",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {

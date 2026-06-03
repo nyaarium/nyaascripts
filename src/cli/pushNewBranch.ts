@@ -1,6 +1,6 @@
-import dotenv from "dotenv";
 import path from "node:path";
 import readline from "node:readline";
+import dotenv from "dotenv";
 import { detectMainBranch, gitPushNewBranch, slugifyBranchName } from "../tools/git/tools/gitPushNewBranch.ts";
 import { checkGHCLI } from "../tools/github/lib/checkGHCLI.ts";
 

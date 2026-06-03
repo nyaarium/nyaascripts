@@ -24,14 +24,20 @@ function runGit(cwd: string, args: string[]): Promise<{ stdout: string; stderr: 
 }
 
 const schema = z.object({
-	branch: z.string().describe("Branch name to switch to (local or remote tracking)."),
+	branch: z.string().describe(
+		`
+Branch name to switch to (local or remote tracking).
+`.trim(),
+	),
 	repoPath: repoPathParam,
 });
 
 export const gitSwitchBranch = {
 	name: "gitSwitchBranch",
 	title: "git-switch-branch",
-	description: "Switch the local working tree to an existing branch (local or remote tracking).",
+	description: `
+Switch the local working tree to an existing branch (local or remote tracking).
+`.trim(),
 	operation: "switching branch",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {

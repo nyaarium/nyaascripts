@@ -115,8 +115,11 @@ const schema = z.object({
 export const gitStatus = {
 	name: "gitStatus",
 	title: "git-status",
-	description:
-		"Get the working tree status of the local git repository. Returns branch name, upstream tracking info, ahead/behind counts, and lists of staged, unstaged, and untracked files.",
+	description: `
+Get the working tree status of the local git repository.
+
+Returns branch name, upstream tracking info, ahead/behind counts, and lists of staged, unstaged, and untracked files.
+`.trim(),
 	operation: "fetching git status",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {

@@ -189,24 +189,61 @@ const schema = z.object({
 	repo: z
 		.string()
 		.optional()
-		.describe("When provided, must be full OWNER/REPO. Leave out unless targeting another repo."),
-	prId: z.string().describe("The pull request number to fetch."),
+		.describe(
+			`
+When provided, must be full OWNER/REPO.
+
+Leave out unless targeting another repo.
+`.trim(),
+		),
+	prId: z.string().describe(
+		`
+The pull request number to fetch.
+`.trim(),
+	),
 	fetchFiles: z
 		.boolean()
 		.optional()
 		.default(false)
-		.describe("Include file details per commit. Use only when PR has few commits."),
+		.describe(
+			`
+Include file details per commit.
+
+Use only when PR has few commits.
+`.trim(),
+		),
 	outputPath: z
 		.string()
 		.optional()
-		.describe("Optional path to write JSON output. If provided, returns path info instead of full data."),
+		.describe(
+			`
+Optional path to write JSON output.
+
+If provided, returns path info instead of full data.
+`.trim(),
+		),
 });
 
 export const githubFetchPr = {
 	name: "githubFetchPr",
 	title: "github-fetch-pr",
-	description:
-		"Fetch a single GitHub pull request by id. Returns: state, author, title, body, comments, mergeStateStatus, mergedAt, mergeCommit, commits (optional files when fetchFiles=true), statusCheckRollup. Use fetchFiles=true only when PR has few commits.",
+	description: `
+Fetch a single GitHub pull request by id.
+
+Returns:
+- state
+- author
+- title
+- body
+- comments
+- mergeStateStatus
+- mergedAt
+- mergeCommit
+- commits (optional files when fetchFiles=true)
+- statusCheckRollup
+
+Use fetchFiles=true only when PR has few commits.
+`.trim(),
 	operation: "fetching PR",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {

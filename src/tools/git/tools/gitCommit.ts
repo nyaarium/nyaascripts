@@ -53,22 +53,48 @@ const schema = z.object({
 		.string()
 		.min(1)
 		.describe(
-			"Commit message. One short phrase or sentence. Verb first, no prefixes. Describe only what changed, not process. Don't include plan/cycle/slice/lap labels or progress narrative anywhere (not at the front, not at the end), e.g. \"(slice 4)\", \"(some phase name)\". The only allowed trailing parenthetical is an issue link. Do not use words like \"fix\" unless the human has confirmed the change is the correct solution; for unverified attempts, use words like \"attempt\" or \"try\" instead. If related to issues, end with (fixes #N) for bugfixes, (closes #N) for completed tasks, (related #N) to link without closing.",
+			`
+Commit message.
+
+One short phrase or sentence. Start with a verb. Describe only what changed, not process.
+
+Rules:
+- No prefixes or tags of any kind at the front, e.g. "[sandbox]", "feat:", "chore:", "wip:".
+- Don't include plan/cycle/slice/lap labels or progress narrative anywhere (not at the front, not at the end), e.g. "[sandbox] Testing things", "(slice 4)", "(some phase name)".
+- The only allowed trailing parenthetical is an issue link.
+- Do not use words like "fix" unless the human has confirmed the change is the correct solution; for unverified attempts, use words like "attempt" or "try" instead.
+- If related to issues, end with (fixes #N) for bugfixes, (closes #N) for completed tasks, (related #N) to link without closing.
+`.trim(),
 		),
 	repoPath: repoPathParam,
 	amend: z
 		.boolean()
 		.optional()
 		.default(false)
-		.describe("If true, amend the previous commit instead of creating a new one."),
-	dryRun: z.boolean().optional().default(false).describe("If true, report what would be committed without doing it."),
+		.describe(
+			`
+If true, amend the previous commit instead of creating a new one.
+`.trim(),
+		),
+	dryRun: z
+		.boolean()
+		.optional()
+		.default(false)
+		.describe(
+			`
+If true, report what would be committed without doing it.
+`.trim(),
+		),
 });
 
 export const gitCommit = {
 	name: "gitCommit",
 	title: "git-commit",
-	description:
-		"Create a git commit with the currently staged files. Prefer short, human-readable commit messages. Consider whether staged changes are a confirmed solution or an exploratory attempt, and reflect that in the message.",
+	description: `
+Create a git commit with the currently staged files.
+
+Prefer short, human-readable commit messages. Consider whether staged changes are a confirmed solution or an exploratory attempt, and reflect that in the message.
+`.trim(),
 	operation: "creating commit",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {

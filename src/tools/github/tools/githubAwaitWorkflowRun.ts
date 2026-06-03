@@ -12,8 +12,19 @@ export function isTerminalStatus(status: string): boolean {
 }
 
 const schema = z.object({
-	runId: z.string().describe("The workflow run ID to poll."),
-	repo: z.string().optional().describe("Full OWNER/REPO. Leave out for current repo."),
+	runId: z.string().describe(
+		`
+The workflow run ID to poll.
+`.trim(),
+	),
+	repo: z
+		.string()
+		.optional()
+		.describe(
+			`
+Full OWNER/REPO. Leave out for current repo.
+`.trim(),
+		),
 	pollIntervalSeconds: z
 		.number()
 		.int()
@@ -21,7 +32,11 @@ const schema = z.object({
 		.max(120)
 		.optional()
 		.default(30)
-		.describe("Seconds between polls (default 30)."),
+		.describe(
+			`
+Seconds between polls (default 30).
+`.trim(),
+		),
 	maxWaitSeconds: z
 		.number()
 		.int()
@@ -29,14 +44,21 @@ const schema = z.object({
 		.max(7200)
 		.optional()
 		.default(1800)
-		.describe("Maximum seconds to wait before timing out (default 1800 = 30min)."),
+		.describe(
+			`
+Maximum seconds to wait before timing out (default 1800 = 30min).
+`.trim(),
+		),
 });
 
 export const githubAwaitWorkflowRun = {
 	name: "githubAwaitWorkflowRun",
 	title: "github-await-workflow-run",
-	description:
-		"Poll a GitHub Actions workflow run until it completes (success or failure). Returns the final status and conclusion.",
+	description: `
+Poll a GitHub Actions workflow run until it completes (success or failure).
+
+Returns the final status and conclusion.
+`.trim(),
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {
 		const { runId, repo, pollIntervalSeconds = 30, maxWaitSeconds = 1800 } = args;

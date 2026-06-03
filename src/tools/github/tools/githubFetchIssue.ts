@@ -186,13 +186,28 @@ const schema = z.object({
 	repo: z
 		.string()
 		.optional()
-		.describe("When provided, must be full OWNER/REPO. Leave out unless targeting another repo."),
-	issueId: z.string().optional().describe("The issue number to fetch. If not provided, fetches a list of issues."),
+		.describe(
+			`
+When provided, must be full OWNER/REPO. Leave out unless targeting another repo.
+`.trim(),
+		),
+	issueId: z
+		.string()
+		.optional()
+		.describe(
+			`
+The issue number to fetch. If not provided, fetches a list of issues.
+`.trim(),
+		),
 	state: z
 		.enum(["open", "closed", "all"])
 		.optional()
 		.default("all")
-		.describe("Filter by issue state (only when fetching list)."),
+		.describe(
+			`
+Filter by issue state (only when fetching list).
+`.trim(),
+		),
 	limit: z
 		.number()
 		.int()
@@ -200,18 +215,29 @@ const schema = z.object({
 		.max(100)
 		.optional()
 		.default(20)
-		.describe("Maximum number of issues to fetch (only when fetching list)."),
+		.describe(
+			`
+Maximum number of issues to fetch (only when fetching list).
+`.trim(),
+		),
 	outputPath: z
 		.string()
 		.optional()
-		.describe("Optional path to write JSON output. If provided, returns path info instead of full data."),
+		.describe(
+			`
+Optional path to write JSON output. If provided, returns path info instead of full data.
+`.trim(),
+		),
 });
 
 export const githubFetchIssue = {
 	name: "githubFetchIssue",
 	title: "github-fetch-issue",
-	description:
-		"Fetch GitHub issues. If issueId is provided, fetches a single issue; otherwise fetches a list. Returns detailed information including comments.",
+	description: `
+Fetch GitHub issues.
+
+If issueId is provided, fetches a single issue; otherwise fetches a list. Returns detailed information including comments.
+`.trim(),
 	operation: "fetching issue(s)",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {

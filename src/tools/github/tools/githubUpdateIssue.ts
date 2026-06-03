@@ -43,26 +43,88 @@ export function describeChanges(args: {
 }
 
 const schema = z.object({
-	issueId: z.string().describe("The issue number to update."),
-	state: z.enum(["open", "closed"]).optional().describe("Set issue state: close or reopen."),
-	title: z.string().optional().describe("New issue title."),
-	body: z.string().optional().describe("New issue body (markdown)."),
-	addLabels: z.array(z.string()).optional().describe("Labels to add."),
-	removeLabels: z.array(z.string()).optional().describe("Labels to remove."),
-	assignees: z.array(z.string()).optional().describe("GitHub usernames to add as assignees."),
-	repo: z.string().optional().describe("Full OWNER/REPO. Leave out for current repo."),
+	issueId: z.string().describe(
+		`
+The issue number to update.
+`.trim(),
+	),
+	state: z
+		.enum(["open", "closed"])
+		.optional()
+		.describe(
+			`
+Set issue state: close or reopen.
+`.trim(),
+		),
+	title: z
+		.string()
+		.optional()
+		.describe(
+			`
+New issue title.
+`.trim(),
+		),
+	body: z
+		.string()
+		.optional()
+		.describe(
+			`
+New issue body (markdown).
+`.trim(),
+		),
+	addLabels: z
+		.array(z.string())
+		.optional()
+		.describe(
+			`
+Labels to add.
+`.trim(),
+		),
+	removeLabels: z
+		.array(z.string())
+		.optional()
+		.describe(
+			`
+Labels to remove.
+`.trim(),
+		),
+	assignees: z
+		.array(z.string())
+		.optional()
+		.describe(
+			`
+GitHub usernames to add as assignees.
+`.trim(),
+		),
+	repo: z
+		.string()
+		.optional()
+		.describe(
+			`
+Full OWNER/REPO.
+
+Leave out for current repo.
+`.trim(),
+		),
 	dryRun: z
 		.boolean()
 		.optional()
 		.default(false)
-		.describe("If true, report what would be changed without actually changing."),
+		.describe(
+			`
+If true, report what would be changed without actually changing.
+`.trim(),
+		),
 });
 
 export const githubUpdateIssue = {
 	name: "githubUpdateIssue",
 	title: "github-update-issue",
-	description:
-		"Update a GitHub issue: close/reopen, change title/body, add/remove labels, change assignees. Mutating action.",
+	description: `
+Update a GitHub issue: close/reopen, change title/body, add/remove labels, change assignees.
+
+Mutating action.
+`.trim(),
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {
 		const { issueId, state, title, body, addLabels, removeLabels, assignees, repo, dryRun = false } = args;

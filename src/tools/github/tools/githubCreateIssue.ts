@@ -25,22 +25,67 @@ export function buildCreateArgs(args: {
 }
 
 const schema = z.object({
-	title: z.string().min(1).describe("Issue title."),
-	body: z.string().optional().describe("Issue body (markdown)."),
-	labels: z.array(z.string()).optional().describe("Labels to add to the issue."),
-	assignees: z.array(z.string()).optional().describe("GitHub usernames to assign."),
-	repo: z.string().optional().describe("Full OWNER/REPO. Leave out for current repo."),
+	title: z
+		.string()
+		.min(1)
+		.describe(
+			`
+Issue title.
+`.trim(),
+		),
+	body: z
+		.string()
+		.optional()
+		.describe(
+			`
+Issue body (markdown).
+`.trim(),
+		),
+	labels: z
+		.array(z.string())
+		.optional()
+		.describe(
+			`
+Labels to add to the issue.
+`.trim(),
+		),
+	assignees: z
+		.array(z.string())
+		.optional()
+		.describe(
+			`
+GitHub usernames to assign.
+`.trim(),
+		),
+	repo: z
+		.string()
+		.optional()
+		.describe(
+			`
+Full OWNER/REPO.
+
+Leave out for current repo.
+`.trim(),
+		),
 	dryRun: z
 		.boolean()
 		.optional()
 		.default(false)
-		.describe("If true, report what would be created without actually creating."),
+		.describe(
+			`
+If true, report what would be created without actually creating.
+`.trim(),
+		),
 });
 
 export const githubCreateIssue = {
 	name: "githubCreateIssue",
 	title: "github-create-issue",
-	description: "Create a new GitHub issue with optional labels and assignees. Mutating action.",
+	description: `
+Create a new GitHub issue with optional labels and assignees.
+
+Mutating action.
+`.trim(),
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {
 		const { title, body, labels, assignees, repo, dryRun = false } = args;

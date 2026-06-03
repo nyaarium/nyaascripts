@@ -84,19 +84,59 @@ async function deriveGitHubRepo(cwd: string): Promise<string> {
 }
 
 const schema = z.object({
-	branchName: z.string().describe("Target branch name to push to."),
-	prTitle: z.string().optional().describe("Pull request title. Required if createPr is true."),
-	createPr: z.boolean().optional().default(false).describe("Whether to create a pull request after pushing."),
-	autoMerge: z.boolean().optional().default(false).describe("Whether to enable auto-merge on the created PR."),
+	branchName: z.string().describe(
+		`
+Target branch name to push to.
+`.trim(),
+	),
+	prTitle: z
+		.string()
+		.optional()
+		.describe(
+			`
+Pull request title.
+
+Required if createPr is true.
+`.trim(),
+		),
+	createPr: z
+		.boolean()
+		.optional()
+		.default(false)
+		.describe(
+			`
+Whether to create a pull request after pushing.
+`.trim(),
+		),
+	autoMerge: z
+		.boolean()
+		.optional()
+		.default(false)
+		.describe(
+			`
+Whether to enable auto-merge on the created PR.
+`.trim(),
+		),
 	repoPath: repoPathParam,
-	dryRun: z.boolean().optional().default(false).describe("If true, report what would happen without executing."),
+	dryRun: z
+		.boolean()
+		.optional()
+		.default(false)
+		.describe(
+			`
+If true, report what would happen without executing.
+`.trim(),
+		),
 });
 
 export const gitPushNewBranch = {
 	name: "gitPushNewBranch",
 	title: "git-push-new-branch",
-	description:
-		"Move commits from main to a new branch and optionally create a PR. When on main, this pushes commits to the new branch and resets local main back to origin/main (commits are moved, not copied). When on a feature branch, pushes to the new branch name. After using this tool, always check gitStatus and gitPull to confirm local state is clean, and verify the PR and any CI runners before resuming other work.",
+	description: `
+Move commits from main to a new branch and optionally create a PR.
+
+When on main, this pushes commits to the new branch and resets local main back to origin/main (commits are moved, not copied). When on a feature branch, pushes to the new branch name. After using this tool, always check gitStatus and gitPull to confirm local state is clean, and verify the PR and any CI runners before resuming other work.
+`.trim(),
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {
 		const { branchName, prTitle, createPr = false, autoMerge = false, dryRun = false } = args;

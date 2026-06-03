@@ -62,7 +62,7 @@ export const OutputInfoSchema = z.object({
 	outputPathAbs: z.string(),
 });
 
-/** Returns the full message (headline + body) for normal commits. For Dependabot commits, returns the headline only — the body is verbose and not useful. */
+/** Returns the full message (headline + body) for normal commits. For Dependabot commits, returns the headline only. The body is verbose and not useful. */
 export function normalizeCommitMessage(headline: string, body: string | null | undefined): string {
 	const dependabotPatterns = [/^Bump .+ from .+ to .+$/i, /^Bump .+ group with .+$/i, /from .+\/dependabot\//i];
 	const isDependabot = dependabotPatterns.some((p) => p.test(headline) || (body && p.test(body)));

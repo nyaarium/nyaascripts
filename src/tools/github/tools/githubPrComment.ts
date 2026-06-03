@@ -6,21 +6,43 @@ const schema = z.object({
 	repo: z
 		.string()
 		.optional()
-		.describe("When provided, must be full OWNER/REPO. Leave out unless targeting another repo."),
-	prId: z.string().describe("The pull request number to comment on."),
-	body: z.string().min(1).describe('The comment body text (e.g. "@dependabot recreate").'),
+		.describe(
+			`
+When provided, must be full OWNER/REPO. Leave out unless targeting another repo.
+`.trim(),
+		),
+	prId: z.string().describe(
+		`
+The pull request number to comment on.
+`.trim(),
+	),
+	body: z
+		.string()
+		.min(1)
+		.describe(
+			`
+The comment body text (e.g. "@dependabot recreate").
+`.trim(),
+		),
 	dryRun: z
 		.boolean()
 		.optional()
 		.default(false)
-		.describe("If true, report what would be posted without actually posting."),
+		.describe(
+			`
+If true, report what would be posted without actually posting.
+`.trim(),
+		),
 });
 
 export const githubPrComment = {
 	name: "githubPrComment",
 	title: "github-pr-comment",
-	description:
-		'Post a comment on a GitHub pull request. Use e.g. for Dependabot PRs with mergeStateStatus DIRTY: post "@dependabot recreate" to trigger a rebase. Mutating action.',
+	description: `
+Post a comment on a GitHub pull request.
+
+Use e.g. for Dependabot PRs with mergeStateStatus DIRTY: post "@dependabot recreate" to trigger a rebase. Mutating action.
+`.trim(),
 	operation: "commenting on PR",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {

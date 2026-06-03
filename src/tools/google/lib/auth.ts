@@ -1,10 +1,10 @@
+import fs from "node:fs";
+import type { Server } from "node:http";
+import path from "node:path";
 import { gmail } from "@googleapis/gmail";
 import dotenv from "dotenv";
 import express from "express";
 import { OAuth2Client } from "google-auth-library";
-import fs from "node:fs";
-import type { Server } from "node:http";
-import path from "node:path";
 
 const SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"];
 const AUTH_PORT = 8080;

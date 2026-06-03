@@ -99,20 +99,40 @@ const schema = z.object({
 		.min(1)
 		.max(10000)
 		.optional()
-		.describe("Number of log entries to fetch (mutually exclusive with range)."),
-	range: z.string().optional().describe("Git range (single hash or hash..hash, mutually exclusive with count)."),
+		.describe(
+			`
+Number of log entries to fetch (mutually exclusive with range).
+`.trim(),
+		),
+	range: z
+		.string()
+		.optional()
+		.describe(
+			`
+Git range (single hash or hash..hash, mutually exclusive with count).
+`.trim(),
+		),
 	repoPath: repoPathParam,
 	outputPath: z
 		.string()
 		.optional()
-		.describe("Optional path to write JSON output. If provided, returns path info instead of full data."),
+		.describe(
+			`
+Optional path to write JSON output.
+
+If provided, returns path info instead of full data.
+`.trim(),
+		),
 });
 
 export const gitLog = {
 	name: "gitLog",
 	title: "git-log",
-	description:
-		"Fetch structured git log data. Supports count mode (-n) or range mode (-r). Requires the MCP client root to be a local git repository. Uses local git, not GitHub API.",
+	description: `
+Fetch structured git log data.
+
+Supports count mode (-n) or range mode (-r). Requires the MCP client root to be a local git repository. Uses local git, not GitHub API.
+`.trim(),
 	operation: "fetching git log",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {

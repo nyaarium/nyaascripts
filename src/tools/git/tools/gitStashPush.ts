@@ -30,14 +30,27 @@ const OutputSchema = z.object({
 });
 
 const schema = z.object({
-	name: z.string().min(1).describe("A unique name for this stash. Must not collide with an existing stash name."),
+	name: z
+		.string()
+		.min(1)
+		.describe(
+			`
+A unique name for this stash.
+
+Must not collide with an existing stash name.
+`.trim(),
+		),
 	repoPath: repoPathParam,
 });
 
 export const gitStashPush = {
 	name: "gitStashPush",
 	title: "git-stash-push",
-	description: "Stash working tree changes with a required name. Fails if a stash with the same name already exists.",
+	description: `
+Stash working tree changes with a required name.
+
+Fails if a stash with the same name already exists.
+`.trim(),
 	operation: "stashing changes",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {

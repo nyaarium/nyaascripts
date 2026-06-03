@@ -62,14 +62,24 @@ export function parseBranchOutput(output: string): z.infer<typeof InputBranchSch
 
 const schema = z.object({
 	repoPath: repoPathParam,
-	dryRun: z.boolean().optional().describe("If true, report what would be deleted without actually deleting."),
+	dryRun: z
+		.boolean()
+		.optional()
+		.describe(
+			`
+If true, report what would be deleted without actually deleting.
+`.trim(),
+		),
 });
 
 export const gitCleanupBranches = {
 	name: "gitCleanupBranches",
 	title: "git-cleanup-branches",
-	description:
-		"Fetch/prune remote refs and delete local branches that are safely removable (merged, gone remote, no unpushed work). Requires the MCP client root to be a local git repository. Reports what was deleted and what was skipped.",
+	description: `
+Fetch/prune remote refs and delete local branches that are safely removable (merged, gone remote, no unpushed work).
+
+Requires the MCP client root to be a local git repository. Reports what was deleted and what was skipped.
+`.trim(),
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {
 		const { dryRun = false } = args;

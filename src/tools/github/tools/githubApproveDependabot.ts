@@ -36,25 +36,55 @@ export function filterDependabotPRs(
 }
 
 const schema = z.object({
-	repo: z.string().optional().describe("Full OWNER/REPO. Leave out for current repo."),
+	repo: z
+		.string()
+		.optional()
+		.describe(
+			`
+Full OWNER/REPO.
+
+Leave out for current repo.
+`.trim(),
+		),
 	approveOwnLibs: z
 		.boolean()
 		.optional()
 		.default(true)
-		.describe("Whether to approve Dependabot PRs for own common libs (js-common, next-common, etc)."),
-	approveDistUpdates: z.boolean().optional().default(false).describe("Whether to approve 'Update dist/ files' PRs."),
+		.describe(
+			`
+Whether to approve Dependabot PRs for own common libs (js-common, next-common, etc).
+`.trim(),
+		),
+	approveDistUpdates: z
+		.boolean()
+		.optional()
+		.default(false)
+		.describe(
+			`
+Whether to approve 'Update dist/ files' PRs.
+`.trim(),
+		),
 	dryRun: z
 		.boolean()
 		.optional()
 		.default(false)
-		.describe("If true, report what would be approved without actually approving."),
+		.describe(
+			`
+If true, report what would be approved without actually approving.
+`.trim(),
+		),
 });
 
 export const githubApproveDependabot = {
 	name: "githubApproveDependabot",
 	title: "github-approve-dependabot",
-	description:
-		"Batch-approve open Dependabot pull requests. Enables auto-merge, approves, and posts @dependabot recreate if the branch is behind base. Optionally approves own-lib and dist/ update PRs.",
+	description: `
+Batch-approve open Dependabot pull requests.
+
+Enables auto-merge, approves, and posts @dependabot recreate if the branch is behind base.
+
+Optionally approves own-lib and dist/ update PRs.
+`.trim(),
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {
 		const { repo, approveOwnLibs = true, approveDistUpdates = false, dryRun = false } = args;

@@ -16,25 +16,53 @@ const schema = z.object({
 	repo: z
 		.string()
 		.optional()
-		.describe("When provided, must be full OWNER/REPO. Leave out unless targeting another repo."),
-	prNumbers: z.array(z.string()).min(1).describe("Array of PR numbers to approve (e.g. ['123', '456'])."),
+		.describe(
+			`
+When provided, must be full OWNER/REPO.
+
+Leave out unless targeting another repo.
+`.trim(),
+		),
+	prNumbers: z
+		.array(z.string())
+		.min(1)
+		.describe(
+			`
+Array of PR numbers to approve (e.g. ['123', '456']).
+`.trim(),
+		),
 	merge: z
 		.boolean()
 		.optional()
 		.default(false)
-		.describe("Whether to merge the PR after approval (auto-merge if enabled, manual merge otherwise)."),
+		.describe(
+			`
+Whether to merge the PR after approval (auto-merge if enabled, manual merge otherwise).
+`.trim(),
+		),
 	dryRun: z
 		.boolean()
 		.optional()
 		.default(false)
-		.describe("If true, report what would be done without actually approving or merging."),
+		.describe(
+			`
+If true, report what would be done without actually approving or merging.
+`.trim(),
+		),
 });
 
 export const githubApprovePr = {
 	name: "githubApprovePr",
 	title: "github-approve-pr",
-	description:
-		'Approve and optionally merge GitHub pull requests. Supports multiple PR numbers. If a PR has author "app/dependabot" and mergeStateStatus is DIRTY, use github-pr-comment to post "@dependabot recreate" first, then approve/merge. Mutating action.',
+	description: `
+Approve and optionally merge GitHub pull requests.
+
+Supports multiple PR numbers.
+
+If a PR has author "app/dependabot" and mergeStateStatus is DIRTY, use github-pr-comment to post "@dependabot recreate" first, then approve/merge.
+
+Mutating action.
+`.trim(),
 	operation: "approving PR(s)",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {

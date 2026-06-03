@@ -9,20 +9,36 @@ const schema = z.object({
 	repo: z
 		.string()
 		.optional()
-		.describe("When provided, must be full OWNER/REPO. Leave out unless targeting another repo."),
-	commitHash: z.string().describe("The commit hash to fetch (full or short)."),
+		.describe(
+			`
+When provided, must be full OWNER/REPO.
+
+Leave out unless targeting another repo.
+`.trim(),
+		),
+	commitHash: z.string().describe(
+		`
+The commit hash to fetch (full or short).
+`.trim(),
+	),
 	outputPath: z
 		.string()
 		.optional()
 		.describe(
-			"Optional path to write JSON output (relative or absolute). If provided, returns path info instead of full data.",
+			`
+Optional path to write JSON output (relative or absolute).
+
+If provided, returns path info instead of full data.
+`.trim(),
 		),
 });
 
 export const githubFetchCommit = {
 	name: "githubFetchCommit",
 	title: "github-fetch-commit",
-	description: "Fetch GitHub commit data.",
+	description: `
+Fetch GitHub commit data.
+`.trim(),
 	operation: "fetching commit",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {

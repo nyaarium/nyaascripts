@@ -52,8 +52,19 @@ export function transformRuns(raw: z.infer<typeof InputRunSchema>[]): z.infer<ty
 }
 
 const schema = z.object({
-	branch: z.string().describe("Branch name to filter workflow runs by (required)."),
-	repo: z.string().optional().describe("Full OWNER/REPO. Leave out for current repo."),
+	branch: z.string().describe(
+		`
+Branch name to filter workflow runs by (required).
+`.trim(),
+	),
+	repo: z
+		.string()
+		.optional()
+		.describe(
+			`
+Full OWNER/REPO. Leave out for current repo.
+`.trim(),
+		),
 	status: z
 		.enum([
 			"queued",
@@ -70,15 +81,33 @@ const schema = z.object({
 			"waiting",
 		])
 		.optional()
-		.describe("Filter by run status."),
-	limit: z.number().int().min(1).max(100).optional().default(20).describe("Max number of runs to return."),
+		.describe(
+			`
+Filter by run status.
+`.trim(),
+		),
+	limit: z
+		.number()
+		.int()
+		.min(1)
+		.max(100)
+		.optional()
+		.default(20)
+		.describe(
+			`
+Max number of runs to return.
+`.trim(),
+		),
 });
 
 export const githubFetchWorkflowRuns = {
 	name: "githubFetchWorkflowRuns",
 	title: "github-fetch-workflow-runs",
-	description:
-		"List GitHub Actions workflow runs filtered by branch. Returns run IDs, status, conclusion, workflow name, and timing for each run.",
+	description: `
+List GitHub Actions workflow runs filtered by branch.
+
+Returns run IDs, status, conclusion, workflow name, and timing for each run.
+`.trim(),
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {
 		const { branch, repo, status, limit = 20 } = args;

@@ -1,5 +1,5 @@
-import dotenv from "dotenv";
 import path from "node:path";
+import dotenv from "dotenv";
 import { gitSummarizeActivity } from "../tools/git/tools/gitSummarizeActivity.ts";
 
 // Load .env from project root

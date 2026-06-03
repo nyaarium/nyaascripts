@@ -25,13 +25,23 @@ function runGit(cwd: string, args: string[]): Promise<{ stdout: string; stderr: 
 
 const schema = z.object({
 	repoPath: repoPathParam,
-	dryRun: z.boolean().optional().default(false).describe("If true, report what would be pushed without doing it."),
+	dryRun: z
+		.boolean()
+		.optional()
+		.default(false)
+		.describe(
+			`
+If true, report what would be pushed without doing it.
+`.trim(),
+		),
 });
 
 export const gitPush = {
 	name: "gitPush",
 	title: "git-push",
-	description: "Push commits on the current branch to the remote.",
+	description: `
+Push commits on the current branch to the remote.
+`.trim(),
 	operation: "pushing to remote",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {

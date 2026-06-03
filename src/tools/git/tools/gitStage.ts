@@ -48,25 +48,43 @@ export function parseDryRunOutput(output: string, action: "staged" | "unstaged")
 }
 
 const schema = z.object({
-	paths: z.array(z.string()).min(1).describe("File paths to stage or unstage, relative to the repo root."),
+	paths: z
+		.array(z.string())
+		.min(1)
+		.describe(
+			`
+File paths to stage or unstage, relative to the repo root.
+`.trim(),
+		),
 	unstage: z
 		.boolean()
 		.optional()
 		.default(false)
-		.describe("If true, unstage files (git restore --staged) instead of staging them."),
+		.describe(
+			`
+If true, unstage files (git restore --staged) instead of staging them.
+`.trim(),
+		),
 	repoPath: repoPathParam,
 	dryRun: z
 		.boolean()
 		.optional()
 		.default(false)
-		.describe("If true, report what would be staged/unstaged without actually doing it."),
+		.describe(
+			`
+If true, report what would be staged/unstaged without actually doing it.
+`.trim(),
+		),
 });
 
 export const gitStage = {
 	name: "gitStage",
 	title: "git-stage",
-	description:
-		"Stage or unstage files in the local git repository. By default stages files (git add). Set unstage to true to unstage files (git restore --staged).",
+	description: `
+Stage or unstage files in the local git repository.
+
+By default stages files (git add). Set unstage to true to unstage files (git restore --staged).
+`.trim(),
 	operation: "staging files",
 	schema,
 	async handler(cwd: string, args: z.infer<typeof schema>) {
