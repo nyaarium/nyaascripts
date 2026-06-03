@@ -255,20 +255,31 @@ const toolDefinitions = {
 	treeMd: {
 		name: "treeMd",
 		title: "tree-md",
-		description:
-			"Render a directory or Markdown file tree. Returns structured JSON (tree) by default; use asString only when the user asks to see the tree printed in the reply.",
+		description: `
+Render a directory or Markdown file tree.
+
+Returns structured JSON (tree) by default; use asString only when the user asks to see the tree printed in the reply.
+`.trim(),
 		operation: "rendering tree",
 		schema: z.object({
 			paths: z
 				.array(z.string())
 				.nonempty()
-				.describe("One or more absolute or relative paths to scan (directories, .md, or .mdc files)."),
+				.describe(
+					`
+One or more absolute or relative paths to scan (directories, .md, or .mdc files).
+`.trim(),
+				),
 			asString: z.coerce
 				.boolean()
 				.optional()
 				.default(false)
 				.describe(
-					"Set true only when the user explicitly asks to see the tree in the reply (e.g. 'show me the tree', 'pretty print it'). Leave false when the result is for your own use (reasoning, picking paths, etc.). Default false returns structured JSON in tree.",
+					`
+Set true only when the user explicitly asks to see the tree in the reply (e.g. 'show me the tree', 'pretty print it').
+
+Leave false when the result is for your own use (reasoning, picking paths, etc.). Default false returns structured JSON in tree.
+`.trim(),
 				),
 		}),
 		async handler(cwd: string, args: Record<string, unknown>) {

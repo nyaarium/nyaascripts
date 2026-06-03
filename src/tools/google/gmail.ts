@@ -68,8 +68,17 @@ function formatMessage(msg: gmail_v1.Schema$Message, preferHtml = false) {
 export const gmailSearch = {
 	name: "gmailSearch",
 	title: "gmail-search",
-	description:
-		"Search Gmail using Gmail search syntax. Returns message ids and threadIds for use with gmail-fetch-messages. Query examples: 'from:user@example.com', 'subject:invoice', 'is:unread', 'after:2024/01/01'.",
+	description: `
+Search Gmail using Gmail search syntax.
+
+Returns message ids and threadIds for use with gmail-fetch-messages.
+
+Query examples:
+- from:user@example.com
+- subject:invoice
+- is:unread
+- after:2024/01/01
+`.trim(),
 	operation: "searching Gmail",
 	schema: z.object({
 		query: z
@@ -77,7 +86,17 @@ export const gmailSearch = {
 			.optional()
 			.default("")
 			.describe(
-				"Gmail search query. Leave empty for recent messages. Examples: from:user@example.com, subject:invoice, is:unread, after:2024/01/01",
+				`
+Gmail search query.
+
+Leave empty for recent messages.
+
+Examples:
+- from:user@example.com
+- subject:invoice
+- is:unread
+- after:2024/01/01
+`.trim(),
 			),
 		maxResults: z
 			.number()
@@ -86,9 +105,28 @@ export const gmailSearch = {
 			.max(100)
 			.optional()
 			.default(20)
-			.describe("Max number of message ids to return."),
-		includeSpamTrash: z.boolean().optional().default(false).describe("Include messages from spam and trash."),
-		pageToken: z.string().optional().describe("Page token from a previous search result to fetch the next page."),
+			.describe(
+				`
+Max number of message ids to return.
+`.trim(),
+			),
+		includeSpamTrash: z
+			.boolean()
+			.optional()
+			.default(false)
+			.describe(
+				`
+Include messages from spam and trash.
+`.trim(),
+			),
+		pageToken: z
+			.string()
+			.optional()
+			.describe(
+				`
+Page token from a previous search result to fetch the next page.
+`.trim(),
+			),
 	}),
 	async handler(_cwd: string, args: Record<string, unknown>) {
 		const { query, maxResults, includeSpamTrash, pageToken } = gmailSearch.schema.parse(args);
@@ -118,16 +156,31 @@ export const gmailSearch = {
 export const gmailFetchMessages = {
 	name: "gmailFetchMessages",
 	title: "gmail-fetch-messages",
-	description:
-		"Fetch full email content by message ids. Pass the id values from gmail-search results. Returns subject, from, to, date, body, snippet for each message.",
+	description: `
+Fetch full email content by message ids.
+
+Pass the id values from gmail-search results. Returns subject, from, to, date, body, snippet for each message.
+`.trim(),
 	operation: "fetching Gmail messages",
 	schema: z.object({
-		ids: z.array(z.string()).min(1).max(51).describe("Array of Gmail message ids from gmail-search (max 50)."),
+		ids: z
+			.array(z.string())
+			.min(1)
+			.max(51)
+			.describe(
+				`
+Array of Gmail message ids from gmail-search (max 50).
+`.trim(),
+			),
 		bodyFormat: z
 			.enum(["plain", "html"])
 			.optional()
 			.default("plain")
-			.describe("Body format: plain (default) or html."),
+			.describe(
+				`
+Body format: plain (default) or html.
+`.trim(),
+			),
 	}),
 	async handler(_cwd: string, args: Record<string, unknown>) {
 		const { ids, bodyFormat } = gmailFetchMessages.schema.parse(args);
