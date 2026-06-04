@@ -27,7 +27,7 @@ dotenv.config({ path: path.join(scriptDir, ".env") });
 
 const mcpServer = new McpServer({
 	name: "nyaascripts",
-	version: "1.2.2",
+	version: "1.2.3",
 });
 
 function registerTool(tool: McpTool) {
