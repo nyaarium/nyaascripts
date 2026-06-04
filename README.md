@@ -20,6 +20,9 @@ bun run build    # outputs ./nyaascripts
 
 # Add scripts to PATH
 export PATH="$HOME/scripts:$PATH"  # add to .bashrc
+
+# Install MCP server
+tmp=$(mktemp) && jq --arg cmd "$HOME/scripts/nyaascripts" '. * {mcpServers: {nyaascripts: {type: "stdio", command: $cmd, args: [], env: {}}}}' ~/.claude.json > "$tmp" && mv "$tmp" ~/.claude.json
 ```
 
 ### Environment
