@@ -59,9 +59,8 @@ Commit message.
 One short phrase or sentence. Start with a verb. Describe only what changed, not process.
 
 Rules:
-- No prefixes or tags of any kind at the front, e.g. "[sandbox]", "feat:", "chore:", "wip:".
-- Don't include plan/cycle/slice/lap labels or progress narrative anywhere (not at the front, not at the end), e.g. "[sandbox] Testing things", "(slice 4)", "(some phase name)".
-- The only allowed trailing parenthetical is an issue link.
+- No prefixes or tags, "feat:", "chore:", "wip:", "[sandbox]".
+- Don't include plan/cycle/slice/lap labels or progress narrative anywhere, e.g. "(slice 4)", "(some phase name)", "[sandbox] Testing things",.
 - Do not use words like "fix" unless the human has confirmed the change is the correct solution; for unverified attempts, use words like "attempt" or "try" instead.
 - If related to issues, end with (fixes #N) for bugfixes, (closes #N) for completed tasks, (related #N) to link without closing.
 `.trim(),
