@@ -4,6 +4,15 @@ set -e
 
 # This script runs on the host machine before the dev container is started.
 
+# Pin the host SSH agent socket before the container starts; compose
+# bind-mounts /tmp/ssh-agent.sock, and dockerd creates a missing mount
+# source as a root-owned directory (see docker-workspace README).
+if [ -x "$HOME/.ssh/ensure-ssh-agent.sh" ]; then
+    "$HOME/.ssh/ensure-ssh-agent.sh" || echo "init-home.sh: SSH agent socket unavailable; container SSH forwarding may not work" >&2
+else
+    echo "init-home.sh: ~/.ssh/ensure-ssh-agent.sh not installed; run .devcontainer/install-ssh-agent.sh or /tmp/ssh-agent.sock may be created as a root-owned directory" >&2
+fi
+
 WORKSPACE_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 
 VOLUME_HOME="${WORKSPACE_ROOT}/volumes/home"

@@ -12,7 +12,11 @@ services:
       SSH_AUTH_SOCK: /tmp/ssh-agent.sock
     volumes:
       # SSH agent forwarding
-      - /tmp/ssh-agent.sock:/tmp/ssh-agent.sock
+      - type: bind
+        source: /tmp/ssh-agent.sock
+        target: /tmp/ssh-agent.sock
+        bind:
+          create_host_path: false
       # Workspace
       - ..:/workspace/nyaascripts:cached
       # Home
