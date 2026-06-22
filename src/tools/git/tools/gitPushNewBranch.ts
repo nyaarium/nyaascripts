@@ -160,9 +160,14 @@ When on main, this pushes commits to the new branch and resets local main back t
 		const ghRepo = await deriveGitHubRepo(effectiveCwd);
 		const repoArgs = ["--repo", ghRepo];
 
-		// Check for uncommitted changes
+		// Check for uncommitted TRACKED changes. Untracked files are ignored: a push never
+		// touches the working tree, and the `reset --hard` on the main path leaves untracked
+		// files in place, so stray untracked files (scratch notes, local docs) must not block.
 		const statusResult = await runGit(effectiveCwd, ["status", "-s"]);
-		if (statusResult.stdout) {
+		const trackedChanges = statusResult.stdout
+			.split("\n")
+			.filter((line) => line.trim().length > 0 && !line.startsWith("??"));
+		if (trackedChanges.length > 0) {
 			throw new Error("You have uncommitted changes. Please commit or stash them first.");
 		}
 
