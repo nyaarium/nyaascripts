@@ -1,5 +1,6 @@
 {
 	"name": "nyaascripts",
+	"private": true,
 	"type": "module",
 	"scripts": {
 		"build": "bun build src/entry.ts --compile --minify --outfile nyaascripts",
