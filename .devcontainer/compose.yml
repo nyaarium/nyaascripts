@@ -21,11 +21,3 @@ services:
       - ..:/workspace/nyaascripts:cached
       # Home
       - ../volumes/home:/home/vscode:cached
-    networks:
-      default:
-      switchboard-network:
-        aliases:
-          - nyaascripts
-networks:
-  switchboard-network:
-    name: switchboard
